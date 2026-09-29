@@ -40,8 +40,10 @@ initTilt();
 
 // ── Coreografía ───────────────────────────────
 const mm = gsap.matchMedia();
+// Solo la landing tiene coreografía; las páginas de utilidad (descargas, confirmación) no.
+const isLanding = Boolean(document.querySelector("[data-intro]"));
 
-mm.add("(prefers-reduced-motion: no-preference)", () =>
+if (isLanding) mm.add("(prefers-reduced-motion: no-preference)", () =>
 {
     // Entrada del hero. Se hace visible y en el mismo frame se aplica el estado inicial.
     gsap.set("[data-intro]", {visibility: "visible", animation: "none"});
@@ -133,7 +135,7 @@ mm.add("(prefers-reduced-motion: no-preference)", () =>
 });
 
 // Con movimiento reducido: solo fundidos de opacidad, sin desplazamientos
-mm.add("(prefers-reduced-motion: reduce)", () =>
+if (isLanding) mm.add("(prefers-reduced-motion: reduce)", () =>
 {
     gsap.from("[data-book-row], #sobre-el-autor, #contacto", {autoAlpha: 0, duration: 0.4});
 });

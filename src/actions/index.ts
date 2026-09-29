@@ -1,38 +1,8 @@
 import {ActionError, defineAction} from 'astro:actions';
 import {z} from 'astro:schema';
-import {Resend} from 'resend';
-import {books} from '../data/books';
 import {formatCOP} from '../data/format';
-
-const resend = new Resend(import.meta.env.RESEND_API_KEY);
-const TO = import.meta.env.CONTACT_EMAIL ?? 'contacto@rigobertomartinezautor.com';
-const FROM = 'Rigoberto Martínez · Libros <onboarding@resend.dev>';
-
-const escape = (value: string) =>
-    value.replace(/[&<>"']/g, (c) => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'})[c]!);
-
-const row = (label: string, value: string) => `
-  <tr>
-    <td style="padding: 10px; background: #F4F1EC; font-weight: bold; width: 35%;">${label}</td>
-    <td style="padding: 10px;">${value}</td>
-  </tr>`;
-
-const layout = (title: string, body: string) => `
-  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #232321;">
-    <h2 style="border-bottom: 2px solid #C68B84; padding-bottom: 8px;">${title}</h2>
-    ${body}
-  </div>`;
-
-const fechaColombia = () => new Date().toLocaleString('es-CO', {timeZone: 'America/Bogota'});
-
-async function send(subject: string, html: string, replyTo: string)
-{
-    const {error} = await resend.emails.send({from: FROM, to: [TO], replyTo, subject, html});
-    if (error)
-    {
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
-    }
-}
+import {AUTHOR_EMAIL, button, escape, colombiaDateTime, layout, row, sendEmail} from '../lib/email';
+import {booksOf, createConfirmToken, newOrderId, type Order} from '../lib/fulfillment';
 
 // eBooks: una licencia por título; qty se ignora
 const itemsSchema = z.array(z.object({id: z.string()})).min(1, 'El carrito está vacío').max(20);
@@ -41,24 +11,25 @@ export const server = {
     contact: defineAction({
         accept: 'form',
         input: z.object({
-            nombre: z.string().trim().min(1, 'El nombre es requerido').max(120),
+            name: z.string().trim().min(1, 'El nombre es requerido').max(120),
             email: z.string().trim().email('Correo inválido'),
-            mensaje: z.string().trim().min(1, 'Escribe tu mensaje').max(4000),
-            autorizacionDatos: z.string().min(1, 'Debes autorizar el tratamiento de datos')
+            message: z.string().trim().min(1, 'Escribe tu mensaje').max(4000),
+            dataConsent: z.string().min(1, 'Debes autorizar el tratamiento de datos')
         }),
-        handler: async ({nombre, email, mensaje}) =>
+        handler: async ({name, email, message}) =>
         {
-            await send(
-                `Nuevo mensaje desde la web: ${nombre}`,
-                layout('Nuevo mensaje desde rigobertomartinezautor.com', `
+            await sendEmail({
+                to: AUTHOR_EMAIL,
+                replyTo: email,
+                subject: `Nuevo mensaje desde la web: ${name}`,
+                html: layout('Nuevo mensaje desde rigobertomartinezautor.com', `
                   <table style="width: 100%; border-collapse: collapse; margin-top: 16px;">
-                    ${row('Nombre', escape(nombre))}
+                    ${row('Nombre', escape(name))}
                     ${row('Correo', `<a href="mailto:${escape(email)}">${escape(email)}</a>`)}
-                    ${row('Mensaje', escape(mensaje).replace(/\n/g, '<br/>'))}
-                    ${row('Autorización datos', `Aceptada el ${fechaColombia()} (Colombia)`)}
-                  </table>`),
-                email
-            );
+                    ${row('Mensaje', escape(message).replace(/\n/g, '<br/>'))}
+                    ${row('Autorización datos', `Aceptada el ${colombiaDateTime()} (Colombia)`)}
+                  </table>`)
+            });
             return {success: true};
         }
     }),
@@ -66,13 +37,13 @@ export const server = {
     order: defineAction({
         accept: 'form',
         input: z.object({
-            nombre: z.string().trim().min(1, 'El nombre es requerido').max(120),
+            name: z.string().trim().min(1, 'El nombre es requerido').max(120),
             email: z.string().trim().email('Correo inválido'),
-            telefono: z.string().trim().min(7, 'Teléfono inválido').max(30),
-            autorizacionDatos: z.string().min(1, 'Debes autorizar el tratamiento de datos'),
+            phone: z.string().trim().min(7, 'Teléfono inválido').max(30),
+            dataConsent: z.string().min(1, 'Debes autorizar el tratamiento de datos'),
             items: z.string()
         }),
-        handler: async ({nombre, email, telefono, items: rawItems}) =>
+        handler: async ({name, email, phone, items: rawItems}, context) =>
         {
             let parsed: unknown;
             try
@@ -85,35 +56,29 @@ export const server = {
             }
 
             const result = itemsSchema.safeParse(parsed);
-            if (!result.success)
-            {
-                throw new ActionError({code: 'BAD_REQUEST', message: 'Carrito inválido'});
-            }
-
             // Títulos y precios salen del catálogo del servidor, nunca del cliente.
-            const ids = [...new Set(result.data.map((i) => i.id))];
-            const lines = ids.flatMap((id) =>
-            {
-                const book = books.find((b) => b.id === id);
-                return book ? [{title: book.title, price: book.price}] : [];
-            });
-
+            const lines = result.success ? booksOf(result.data.map((i) => i.id)) : [];
             if (lines.length === 0)
             {
                 throw new ActionError({code: 'BAD_REQUEST', message: 'Carrito inválido'});
             }
 
-            const total = lines.reduce((sum, l) => sum + l.price, 0);
-            const itemsHtml = lines.map((l) => `
+            const order: Order = {id: newOrderId(), name, email, phone, bookIds: lines.map((b) => b.id)};
+            const total = lines.reduce((sum, b) => sum + b.price, 0);
+            const confirmUrl = `${context.url.origin}/order/confirm?token=${encodeURIComponent(createConfirmToken(order))}`;
+
+            const itemsHtml = lines.map((b) => `
               <tr>
-                <td style="padding: 8px 10px;">${escape(l.title)}</td>
+                <td style="padding: 8px 10px;">${escape(b.title)}</td>
                 <td style="padding: 8px 10px; text-align: center;">eBook</td>
-                <td style="padding: 8px 10px; text-align: right;">${formatCOP(l.price)}</td>
+                <td style="padding: 8px 10px; text-align: right;">${formatCOP(b.price)}</td>
               </tr>`).join('');
 
-            await send(
-                `Nuevo pedido de eBooks: ${nombre} · ${formatCOP(total)}`,
-                layout('Nuevo pedido desde la web', `
+            await sendEmail({
+                to: AUTHOR_EMAIL,
+                replyTo: email,
+                subject: `Nuevo pedido de eBooks ${order.id}: ${name} · ${formatCOP(total)}`,
+                html: layout(`Nuevo pedido ${order.id}`, `
                   <table style="width: 100%; border-collapse: collapse; margin-top: 16px;">
                     <tr style="background: #232321; color: #F4F1EC;">
                       <th style="padding: 8px 10px; text-align: left;">Libro</th>
@@ -127,16 +92,34 @@ export const server = {
                     </tr>
                   </table>
                   <table style="width: 100%; border-collapse: collapse; margin-top: 24px;">
-                    ${row('Nombre', escape(nombre))}
+                    ${row('Pedido', escape(order.id))}
+                    ${row('Nombre', escape(name))}
                     ${row('Correo', `<a href="mailto:${escape(email)}">${escape(email)}</a>`)}
-                    ${row('Teléfono', escape(telefono))}
-                    ${row('Autorización datos', `Aceptada el ${fechaColombia()} (Colombia)`)}
+                    ${row('Teléfono', escape(phone))}
+                    ${row('Autorización datos', `Aceptada el ${colombiaDateTime()} (Colombia)`)}
                   </table>
-                  <p style="margin-top: 20px; color: #6B6862;">Responde a este correo con los datos de pago; al confirmarlo, envía los eBooks al comprador.</p>`),
-                email
-            );
+                  <h3 style="margin-top: 28px;">Siguientes pasos</h3>
+                  <ol style="line-height: 1.6; padding-left: 20px;">
+                    <li>Responde a este correo con los datos de pago.</li>
+                    <li>Cuando recibas el pago, pulsa el botón. El comprador recibirá sus eBooks sellados con su nombre y enlaces que vencen.</li>
+                  </ol>
+                  ${button(confirmUrl, 'Confirmar pago y enviar eBooks')}
+                  <p style="color: #6B6862; font-size: 13px;">No reenvíes este correo: el botón entrega los libros a este comprador.</p>`)
+            });
 
-            return {success: true, total};
+            // Acuse al comprador. Si falla (p. ej. dominio de envío sin verificar), el pedido ya quedó registrado.
+            await sendEmail({
+                to: email,
+                replyTo: AUTHOR_EMAIL,
+                subject: `Recibimos tu pedido ${order.id}`,
+                html: layout(`Hola, ${escape(name)}`, `
+                  <p>Recibimos tu pedido <strong>${escape(order.id)}</strong> por <strong>${formatCOP(total)}</strong>:</p>
+                  <ul>${lines.map((b) => `<li>${escape(b.title)} (eBook)</li>`).join('')}</ul>
+                  <p>En menos de 48 horas te escribiré con los datos de pago. Al confirmarlo recibirás los enlaces de descarga en este correo.</p>
+                  <p style="color: #6B6862;">Rigoberto Martínez Bermúdez</p>`)
+            }).catch((err) => console.error('[order] acuse al comprador falló:', err));
+
+            return {success: true, orderId: order.id, total};
         }
     })
 };

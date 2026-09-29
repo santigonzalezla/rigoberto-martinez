@@ -1,0 +1,34 @@
+---
+import Layout from "../layouts/Layout.astro";
+import StatusCard from "../components/ui/StatusCard.astro";
+
+export const prerender = false;
+
+const email = "contacto@rigobertomartinezautor.com";
+const reason = Astro.url.searchParams.get("reason");
+
+const copy = {
+    expired: {
+        title: "Este enlace de descarga venció",
+        text: "Por seguridad, los enlaces de los eBooks son temporales. Escríbeme con tu número de pedido y te envío uno nuevo."
+    },
+    error: {
+        title: "No pudimos preparar tu eBook",
+        text: "Tuvimos un problema generando el archivo. Intenta de nuevo en unos minutos; si continúa, escríbeme con tu número de pedido."
+    },
+    invalid: {
+        title: "Enlace no válido",
+        text: "El enlace está incompleto o fue modificado. Ábrelo directamente desde el correo que recibiste."
+    }
+}[reason === "expired" || reason === "error" ? reason : "invalid"];
+
+Astro.response.headers.set("Cache-Control", "no-store");
+---
+
+<Layout title="Descarga no disponible · Rigoberto Martínez" noindex>
+    <StatusCard eyebrow="Descarga de eBook" title={copy.title} tone="error">
+        <p>{copy.text}</p>
+        <a href={`mailto:${email}?subject=${encodeURIComponent("Nuevo enlace de descarga")}`} class="btnPrimary">Escribir a {email}</a>
+        <a href="/" class="btnGhost">Volver a la página</a>
+    </StatusCard>
+</Layout>

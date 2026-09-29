@@ -32,7 +32,7 @@ export default function ContactForm()
         <form className={styles.formCard} onSubmit={handleSubmit} data-form-card>
             <label className={styles.field}>
                 <span className={styles.label}>Nombre</span>
-                <input className={styles.input} type="text" name="nombre" autoComplete="name" required/>
+                <input className={styles.input} type="text" name="name" autoComplete="name" required/>
             </label>
             <label className={styles.field}>
                 <span className={styles.label}>Correo</span>
@@ -40,10 +40,10 @@ export default function ContactForm()
             </label>
             <label className={styles.field}>
                 <span className={styles.label}>Mensaje</span>
-                <textarea className={`${styles.input} ${styles.textarea}`} name="mensaje" required/>
+                <textarea className={`${styles.input} ${styles.textarea}`} name="message" required/>
             </label>
             <label className={styles.consent}>
-                <input type="checkbox" name="autorizacionDatos" required/>
+                <input type="checkbox" name="dataConsent" required/>
                 <span>Autorizo el tratamiento de mis datos personales para responder este mensaje (Ley 1581 de 2012).</span>
             </label>
             <button type="submit" className={`btnPrimary ${styles.submit}`} disabled={loading}>

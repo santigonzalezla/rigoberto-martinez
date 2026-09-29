@@ -1,0 +1,124 @@
+---
+interface Props
+{
+    eyebrow: string;
+    title: string;
+    tone?: 'default' | 'success' | 'error';
+}
+
+const {eyebrow, title, tone = 'default'} = Astro.props;
+---
+
+<main class="statusPage">
+    <a href="/" class="logo serif" aria-label="Rigoberto Martínez, inicio">
+        <span>Rigoberto</span>
+        <span>Martínez</span>
+    </a>
+    <section class:list={["card", tone]}>
+        <p class="eyebrow">{eyebrow}</p>
+        <h1 class="title serif">{title}</h1>
+        <div class="body">
+            <slot/>
+        </div>
+    </section>
+</main>
+
+<style>
+    .statusPage {
+        min-height: 100dvh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 40px;
+        padding: 48px var(--px);
+    }
+
+    .logo {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-weight: 900;
+        font-size: 24px;
+        line-height: 0.96;
+        letter-spacing: -0.02em;
+    }
+
+    .card {
+        width: min(560px, 100%);
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        padding: 40px;
+        background: var(--c-papel);
+        border: 1px solid var(--c-linea);
+        border-radius: var(--r-lg);
+        box-shadow: var(--shadow-card);
+        animation: cardIn 700ms var(--ease-out) both;
+    }
+
+    .card.success {
+        border-top: 3px solid var(--c-tinta);
+    }
+
+    .card.error {
+        border-top: 3px solid var(--c-terracota);
+    }
+
+    @keyframes cardIn {
+        from {
+            opacity: 0;
+            transform: translateY(16px);
+        }
+    }
+
+    .title {
+        font-weight: 600;
+        font-size: clamp(26px, 3vw, 34px);
+        line-height: 1.1;
+        letter-spacing: -0.015em;
+    }
+
+    .body {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        font-size: 16px;
+        line-height: 1.6;
+        color: var(--c-grafito);
+    }
+
+    .body :global(strong) {
+        color: var(--c-tinta);
+    }
+
+    .body :global(ul) {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 16px 0;
+        border-top: 1px solid var(--c-linea);
+        border-bottom: 1px solid var(--c-linea);
+        list-style: none;
+    }
+
+    .body :global(form) {
+        margin-top: 8px;
+    }
+
+    .body :global(.btnPrimary) {
+        width: 100%;
+    }
+
+    @media (max-width: 767px) {
+        .card {
+            padding: 28px 22px;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .card {
+            animation: none;
+        }
+    }
+</style>

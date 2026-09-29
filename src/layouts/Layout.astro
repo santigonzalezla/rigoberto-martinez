@@ -9,13 +9,15 @@ interface Props
     description?: string;
     image?: string;
     canonical?: string;
+    noindex?: boolean;
 }
 
 const {
     title = "Rigoberto Martínez — Libros sobre liderazgo, comportamiento y cultura de equipo",
     description = "Conviértete en el Líder que tu Equipo Necesita, La Conchudez y Endomarketing y Cliente Interno: tres libros de Rigoberto Martínez Bermúdez para liderar con criterio.",
     image,
-    canonical
+    canonical,
+    noindex = false
 } = Astro.props;
 
 const ogImage = await getImage({src: defaultOgSource, width: 1200, height: 630, fit: 'cover', position: 'top', format: 'jpg'});
@@ -37,6 +39,7 @@ const ogImageURL = new URL(image ?? ogImage.src, Astro.site);
     <title>{title}</title>
     <meta name="description" content={description}/>
     <meta name="author" content="Rigoberto Martínez Bermúdez"/>
+    {noindex && <meta name="robots" content="noindex, nofollow"/>}
 
     <meta property="og:type" content="website"/>
     <meta property="og:site_name" content="Rigoberto Martínez — Autor"/>

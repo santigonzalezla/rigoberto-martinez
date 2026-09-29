@@ -151,7 +151,7 @@ export default function CartDrawer({catalog}: Props)
                         <div className={styles.fields}>
                             <label className={styles.field}>
                                 <span>Nombre completo</span>
-                                <input name="nombre" type="text" autoComplete="name" required/>
+                                <input name="name" type="text" autoComplete="name" required/>
                             </label>
                             <label className={styles.field}>
                                 <span>Correo</span>
@@ -159,11 +159,11 @@ export default function CartDrawer({catalog}: Props)
                             </label>
                             <label className={styles.field}>
                                 <span>Teléfono / WhatsApp</span>
-                                <input name="telefono" type="tel" autoComplete="tel" required/>
+                                <input name="phone" type="tel" autoComplete="tel" required/>
                             </label>
                             <p className={styles.note}>Los eBooks se envían a este correo. Revisa que esté bien escrito.</p>
                             <label className={styles.consent}>
-                                <input type="checkbox" name="autorizacionDatos" required/>
+                                <input type="checkbox" name="dataConsent" required/>
                                 <span>Autorizo el tratamiento de mis datos personales para gestionar este pedido (Ley 1581 de 2012).</span>
                             </label>
                         </div>

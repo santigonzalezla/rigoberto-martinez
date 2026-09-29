@@ -1,0 +1,91 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import StatusCard from "../../components/ui/StatusCard.astro";
+import {booksOf, DOWNLOAD_TTL_HOURS, fulfillOrder, verifyConfirmToken} from "../../lib/fulfillment";
+import {formatCOP} from "../../data/format";
+
+export const prerender = false;
+
+/*
+ * Página privada del autor. Se abre desde el botón del correo del pedido.
+ * GET solo muestra el resumen: los escáneres de enlaces de los correos hacen GET,
+ * así que la entrega exige pulsar el botón (POST).
+ */
+type View =
+    | {kind: 'review'}
+    | {kind: 'sent'; expires: string}
+    | {kind: 'error'; message: string};
+
+let token = Astro.url.searchParams.get('token') ?? '';
+if (Astro.request.method === 'POST')
+{
+    const form = await Astro.request.formData();
+    token = String(form.get('token') ?? '');
+}
+
+const verified = verifyConfirmToken(token);
+let view: View = {kind: 'review'};
+
+if (!verified.ok)
+{
+    view = {
+        kind: 'error',
+        message: verified.reason === 'expired'
+            ? 'Este enlace de confirmación venció (30 días). Pídele al comprador que haga el pedido de nuevo.'
+            : 'El enlace no es válido. Ábrelo directamente desde el correo del pedido.'
+    };
+}
+else if (Astro.request.method === 'POST')
+{
+    try
+    {
+        const result = await fulfillOrder(verified.payload, Astro.url.origin);
+        view = {kind: 'sent', expires: result.expires};
+    }
+    catch (err)
+    {
+        console.error('[order/confirm] delivery failed:', err);
+        view = {kind: 'error', message: 'No se pudo enviar el correo con los eBooks. Revisa la configuración de Resend e intenta de nuevo.'};
+    }
+}
+
+const order = verified.ok ? verified.payload : null;
+const items = order ? booksOf(order.bookIds) : [];
+const total = items.reduce((sum, b) => sum + b.price, 0);
+
+Astro.response.headers.set('Cache-Control', 'no-store');
+Astro.response.headers.set('Referrer-Policy', 'no-referrer');
+---
+
+<Layout title="Confirmar pedido · Rigoberto Martínez" noindex>
+    {view.kind === 'error' && (
+        <StatusCard eyebrow="Confirmación de pedido" title="No se pudo continuar" tone="error">
+            <p>{view.message}</p>
+        </StatusCard>
+    )}
+
+    {view.kind === 'review' && order && (
+        <StatusCard eyebrow={`Pedido ${order.id}`} title="Confirmar pago y enviar eBooks">
+            <p><strong>{order.name}</strong> · {order.email} · {order.phone}</p>
+            <ul>
+                {items.map((b) => <li>{b.title} — {formatCOP(b.price)}</li>)}
+                <li><strong>Total: {formatCOP(total)}</strong></li>
+            </ul>
+            <p>
+                Confirma solo cuando hayas recibido el pago. El comprador recibirá un enlace por libro,
+                válido por {DOWNLOAD_TTL_HOURS} horas, con el PDF sellado con su nombre y correo.
+            </p>
+            <form method="POST">
+                <input type="hidden" name="token" value={token}/>
+                <button type="submit" class="btnPrimary">Confirmar pago y enviar eBooks</button>
+            </form>
+        </StatusCard>
+    )}
+
+    {view.kind === 'sent' && order && (
+        <StatusCard eyebrow={`Pedido ${order.id}`} title="eBooks enviados" tone="success">
+            <p>Le enviamos a <strong>{order.email}</strong> los enlaces de descarga de {items.length} {items.length === 1 ? 'libro' : 'libros'}.</p>
+            <p>Los enlaces vencen el <strong>{view.expires}</strong>. Si el comprador no alcanza a descargarlos, vuelve a abrir este enlace y pulsa el botón otra vez: se generan enlaces nuevos.</p>
+        </StatusCard>
+    )}
+</Layout>
