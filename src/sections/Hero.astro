@@ -1,0 +1,260 @@
+---
+import {Image} from "astro:assets";
+import retrato from "../assets/images/retrato.webp";
+
+const title = "Tres libros sobre liderazgo, comportamiento y cultura de equipo";
+---
+
+<section class="hero" id="top" data-intro>
+    <div class="heroRow container">
+        <div class="heroCopy">
+            <p class="eyebrow" data-hero-fade>Autor · 3 libros publicados</p>
+            <h1 class="heroTitle serif" aria-label={title}>
+                {title.split(" ").map((word) => (
+                    <span class="word" aria-hidden="true"><span class="wordInner" data-hero-word>{word}</span></span>
+                ))}
+            </h1>
+            <p class="heroSubtitle" data-hero-fade>
+                Historias y metodologías reales para liderar con criterio, entender la conchudez que sabotea los
+                equipos y construir una cultura que pone al colaborador primero.
+            </p>
+            <div class="heroCtas" data-hero-fade>
+                <a href="#libros" class="btnPrimary">Ver los 3 libros</a>
+            </div>
+        </div>
+
+        <div class="heroPortrait">
+            <div class="portraitTilt" data-tilt data-tilt-max="7">
+                <div class="portraitFrame" data-hero-portrait>
+                    <Image
+                        src={retrato}
+                        alt="Retrato de Rigoberto Martínez Bermúdez"
+                        widths={[460, 920]}
+                        sizes="(max-width: 767px) 90vw, 460px"
+                        loading="eager"
+                        fetchpriority="high"
+                        class="portraitImg"
+                        data-hero-portrait-img
+                    />
+                    <span class="tiltGlare" data-tilt-glare></span>
+                </div>
+                <div class="credential" data-hero-credential>
+                    <p class="credentialLabel serif">Bestseller</p>
+                    <p class="credentialText">Autor de 3 libros sobre liderazgo y cultura organizacional</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .hero {
+        min-height: min(800px, calc(100dvh - 104px));
+        display: flex;
+        align-items: center;
+        padding: 40px 0 80px;
+    }
+
+    .heroRow {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 460px;
+        gap: 72px;
+        align-items: start;
+    }
+
+    .heroCopy {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 28px;
+        padding-top: 24px;
+    }
+
+    .heroTitle {
+        font-weight: 600;
+        font-size: clamp(40px, 4.45vw, 64px);
+        line-height: 1.04;
+        letter-spacing: -0.015em;
+        color: var(--c-tinta);
+    }
+
+    /* Máscara por palabra para el revelado */
+    .word {
+        display: inline-block;
+        overflow: hidden;
+        vertical-align: top;
+        padding-bottom: 0.08em;
+        margin-bottom: -0.08em;
+    }
+
+    .word:not(:last-child) {
+        margin-right: 0.24em;
+    }
+
+    .wordInner {
+        display: inline-block;
+        will-change: transform;
+    }
+
+    .heroSubtitle {
+        max-width: 560px;
+        font-size: 18px;
+        line-height: 1.6;
+        color: var(--c-grafito);
+    }
+
+    /* ── Retrato con profundidad ─────────────── */
+    .heroPortrait {
+        position: relative;
+        width: 460px;
+        height: 600px;
+        perspective: 1400px;
+    }
+
+    .portraitTilt {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        transform-style: preserve-3d;
+        will-change: transform;
+    }
+
+    .portraitFrame {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 460px;
+        height: 560px;
+        border-radius: var(--r-xl);
+        overflow: hidden;
+        box-shadow: var(--shadow-book);
+        transform: translateZ(0);
+    }
+
+    .portraitFrame :global(.portraitImg) {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center top;
+    }
+
+    .tiltGlare {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0;
+        background: radial-gradient(circle at var(--gx, 50%) var(--gy, 30%), rgba(255, 255, 255, 0.28), transparent 55%);
+        mix-blend-mode: soft-light;
+        transition: opacity 400ms ease;
+    }
+
+    .credential {
+        position: absolute;
+        left: -56px;
+        top: 430px;
+        width: 320px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        padding: 24px;
+        border-radius: var(--r-lg);
+        background: var(--c-terracota);
+        transform: translateZ(48px);
+        box-shadow: 0 2px 4px rgba(90, 50, 40, 0.1), 0 18px 36px -12px rgba(90, 50, 40, 0.38);
+    }
+
+    .credentialLabel {
+        font-style: italic;
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.75);
+    }
+
+    .credentialText {
+        font-weight: 600;
+        font-size: 17px;
+        line-height: 1.35;
+        color: var(--c-tinta);
+    }
+
+    @media (max-width: 1180px) {
+        .heroRow {
+            grid-template-columns: minmax(0, 1fr) 380px;
+            gap: 56px;
+        }
+
+        .heroPortrait {
+            width: 380px;
+            height: 520px;
+        }
+
+        .portraitFrame {
+            width: 380px;
+            height: 480px;
+        }
+
+        .credential {
+            top: 370px;
+            left: -40px;
+            width: 290px;
+        }
+    }
+
+    @media (max-width: 900px) {
+        .hero {
+            min-height: auto;
+            padding: 24px 0 64px;
+        }
+
+        .heroRow {
+            grid-template-columns: 1fr;
+            gap: 48px;
+        }
+
+        .heroPortrait {
+            justify-self: center;
+        }
+    }
+
+    @media (max-width: 767px) {
+        .heroCopy {
+            gap: 22px;
+            padding-top: 8px;
+        }
+
+        .heroTitle {
+            font-size: clamp(34px, 9.4vw, 44px);
+        }
+
+        .heroSubtitle {
+            font-size: 16px;
+        }
+
+        .heroCtas,
+        .heroCtas .btnPrimary {
+            width: 100%;
+        }
+
+        .heroPortrait {
+            width: 100%;
+            max-width: 380px;
+            height: auto;
+            padding-bottom: 72px;
+        }
+
+        .portraitFrame {
+            position: relative;
+            width: 100%;
+            height: auto;
+            aspect-ratio: 460 / 560;
+        }
+
+        .credential {
+            top: auto;
+            bottom: 0;
+            left: 16px;
+            right: 16px;
+            width: auto;
+            padding: 20px;
+        }
+    }
+</style>

@@ -1,0 +1,84 @@
+.formCard {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  padding: 40px;
+  background: var(--c-papel);
+  border: 1px solid var(--c-linea);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-card);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-weight: 500;
+  font-size: 13px;
+  color: var(--c-grafito);
+}
+
+.input {
+  display: block;
+  width: 100%;
+  height: 48px;
+  padding: 0 16px;
+  background: var(--c-hueso);
+  border: 1px solid var(--c-linea);
+  border-radius: var(--r-sm);
+  font-family: var(--f-sans);
+  font-size: 16px;
+  color: var(--c-tinta);
+  outline: none;
+  transition: border-color 200ms ease, box-shadow 200ms ease, background-color 200ms ease;
+}
+
+.input:focus {
+  background: var(--c-papel);
+  border-color: var(--c-terracota);
+  box-shadow: 0 0 0 3px rgba(198, 139, 132, 0.22);
+}
+
+.textarea {
+  height: 110px;
+  padding: 14px 16px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.consent {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--c-grafito);
+  cursor: pointer;
+}
+
+.consent input {
+  margin-top: 3px;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  accent-color: var(--c-tinta);
+}
+
+.submit {
+  width: 100%;
+}
+
+.submit:disabled {
+  opacity: 0.55;
+  cursor: progress;
+}
+
+@media (max-width: 767px) {
+  .formCard {
+    padding: 28px 20px;
+  }
+}

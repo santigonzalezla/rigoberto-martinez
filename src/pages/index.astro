@@ -1,0 +1,50 @@
+---
+import {getImage} from "astro:assets";
+import {Toaster} from "sonner";
+import Layout from "../layouts/Layout.astro";
+import Navbar from "../sections/Navbar.astro";
+import Hero from "../sections/Hero.astro";
+import Credibility from "../sections/Credibility.astro";
+import Books from "../sections/Books.astro";
+import About from "../sections/About.astro";
+import Contact from "../sections/Contact.astro";
+import Footer from "../sections/Footer.astro";
+import CartDrawer from "../components/cart/CartDrawer";
+import BookPreview from "../components/books/BookPreview";
+import StructuredData from "../components/seo/StructuredData.astro";
+import {bookMeta, books} from "../data/books";
+import type {CatalogBook} from "../components/cart/cartStore";
+
+export const prerender = true;
+
+// Catálogo serializable para las islas (portadas ya optimizadas)
+const catalog: CatalogBook[] = await Promise.all(books.map(async (book) => ({
+    id: book.id,
+    title: book.title,
+    meta: bookMeta(book),
+    synopsis: book.synopsis,
+    price: book.price,
+    cover: (await getImage({src: book.cover, width: 520, format: 'webp'})).src
+})));
+---
+
+<Layout>
+    <StructuredData slot="head"/>
+    <Navbar/>
+    <main>
+        <Hero/>
+        <Credibility/>
+        <Books/>
+        <About/>
+        <Contact/>
+    </main>
+    <Footer/>
+
+    <CartDrawer client:only="react" catalog={catalog}/>
+    <BookPreview client:only="react" catalog={catalog}/>
+    <Toaster
+        client:only="react"
+        position="bottom-center"
+        toastOptions={{style: {fontFamily: 'Geist, sans-serif', background: '#232321', color: '#F4F1EC', border: 'none', borderRadius: '14px'}}}
+    />
+</Layout>

@@ -1,0 +1,173 @@
+---
+import LinkedinIcon from "../assets/svg/linkedin.svg";
+import YoutubeIcon from "../assets/svg/youtube.svg";
+
+const links = [
+    {href: "#libros", label: "Libros"},
+    {href: "#sobre-el-autor", label: "Sobre el autor"},
+    {href: "#contacto", label: "Contacto"}
+];
+
+// TODO: reemplazar por los perfiles reales del autor
+const social = [
+    {href: "https://www.linkedin.com/", label: "LinkedIn", Icon: LinkedinIcon},
+    {href: "https://www.youtube.com/", label: "YouTube", Icon: YoutubeIcon}
+];
+
+const email = "contacto@rigobertomartinezautor.com";
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+    <div class="footerInner container" data-footer>
+        <div class="top">
+            <a href="#top" class="logo serif" aria-label="Volver al inicio">
+                <span>Rigoberto</span>
+                <span>Martínez</span>
+            </a>
+
+            <nav class="links" aria-label="Pie de página">
+                {links.map(({href, label}) => <a href={href} class="link">{label}</a>)}
+            </nav>
+
+            <div class="social">
+                {social.map(({href, label, Icon}) => (
+                    <a href={href} class="socialLink" aria-label={label} target="_blank" rel="noopener noreferrer">
+                        <Icon width={20} height={20}/>
+                    </a>
+                ))}
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="legal">
+            <p>© {year} Rigoberto Martínez Bermúdez · Colombia</p>
+            <a href={`mailto:${email}`} class="legalLink">{email}</a>
+        </div>
+    </div>
+</footer>
+
+<style>
+    .footer {
+        position: relative;
+        z-index: 2;
+        background: var(--c-tinta);
+        color: var(--c-hueso);
+    }
+
+    .footerInner {
+        display: flex;
+        flex-direction: column;
+        gap: 40px;
+        padding-top: 80px;
+        padding-bottom: 44px;
+    }
+
+    .top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 32px;
+    }
+
+    .logo {
+        display: flex;
+        flex-direction: column;
+        font-weight: 900;
+        font-size: 26px;
+        line-height: 0.96;
+        letter-spacing: -0.02em;
+        color: var(--c-hueso);
+    }
+
+    .links {
+        display: flex;
+        gap: 32px;
+    }
+
+    .link {
+        font-weight: 500;
+        font-size: 15px;
+        color: rgba(255, 255, 255, 0.7);
+        transition: color 200ms ease;
+    }
+
+    .social {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .socialLink {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        margin: -12px;
+        border-radius: var(--r-pill);
+        transition: transform 200ms var(--ease-out), background-color 200ms ease;
+    }
+
+    .socialLink + .socialLink {
+        margin-left: 0;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+        .link:hover {
+            color: var(--c-hueso);
+        }
+
+        .socialLink:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+        }
+    }
+
+    .divider {
+        height: 1px;
+        background: rgba(255, 255, 255, 0.12);
+    }
+
+    .legal {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        font-weight: 500;
+        font-size: 12px;
+        letter-spacing: 0.005em;
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .legalLink:hover {
+        color: var(--c-hueso);
+    }
+
+    @media (max-width: 767px) {
+        .footerInner {
+            padding-top: 56px;
+            gap: 32px;
+        }
+
+        .top {
+            flex-direction: column;
+            gap: 28px;
+        }
+
+        .links {
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .social {
+            margin-left: 12px;
+        }
+
+        .legal {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+</style>

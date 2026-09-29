@@ -1,0 +1,54 @@
+---
+const items = ["3 libros publicados", "Liderazgo y gestión", "Comportamiento organizacional", "Cultura y servicio"];
+---
+
+<section class="credibility" aria-label="Temas de los libros">
+    <ul class="credibilityList container">
+        {items.map((item, i) => (
+            <>
+                {i > 0 && <li class="dot" aria-hidden="true" data-cred-item>·</li>}
+                <li class="item" data-cred-item>{item}</li>
+            </>
+        ))}
+    </ul>
+</section>
+
+<style>
+    .credibility {
+        position: relative;
+        z-index: 2;
+        background: var(--c-papel);
+        border-top: 1px solid var(--c-linea);
+        border-bottom: 1px solid var(--c-linea);
+    }
+
+    .credibilityList {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 12px 28px;
+        padding-top: 30px;
+        padding-bottom: 30px;
+        font-weight: 500;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+
+    .item {
+        color: var(--c-grafito);
+        letter-spacing: 0.005em;
+    }
+
+    .dot {
+        color: var(--c-terracota);
+    }
+
+    @media (max-width: 767px) {
+        .credibilityList {
+            gap: 8px 14px;
+            padding-top: 22px;
+            padding-bottom: 22px;
+        }
+    }
+</style>

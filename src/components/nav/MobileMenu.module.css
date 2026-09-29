@@ -1,0 +1,119 @@
+.burger {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid var(--c-linea);
+  border-radius: var(--r-pill);
+  transition: transform 160ms var(--ease-out);
+}
+
+.burger:active {
+  transform: scale(0.95);
+}
+
+.burger span {
+  display: block;
+  width: 18px;
+  height: 1.5px;
+  border-radius: 2px;
+  background: var(--c-tinta);
+  transition: transform 260ms var(--ease-out);
+}
+
+.burgerOpen span:first-child {
+  transform: translateY(3.75px) rotate(45deg);
+}
+
+.burgerOpen span:last-child {
+  transform: translateY(-3.75px) rotate(-45deg);
+}
+
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+}
+
+.root.open {
+  pointer-events: auto;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(26, 25, 23, 0.35);
+  opacity: 0;
+  transition: opacity 240ms ease;
+}
+
+.open .overlay {
+  opacity: 1;
+}
+
+.sheet {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  display: flex;
+  flex-direction: column;
+  padding: 88px 24px 24px;
+  background: var(--c-hueso);
+  border: 1px solid var(--c-linea);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-card);
+  transform: translateY(-16px) scale(0.98);
+  transform-origin: top right;
+  opacity: 0;
+  transition: opacity 200ms ease, transform 260ms var(--ease-out);
+}
+
+.open .sheet {
+  opacity: 1;
+  transform: none;
+}
+
+.link {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--c-linea);
+  font-family: var(--f-serif);
+  font-weight: 500;
+  font-size: 28px;
+  letter-spacing: -0.02em;
+  color: var(--c-tinta);
+  font-variation-settings: "SOFT" 0, "WONK" 1;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 260ms ease, transform 320ms var(--ease-out);
+}
+
+.open .link {
+  opacity: 1;
+  transform: none;
+}
+
+.index {
+  font-family: var(--f-mono);
+  font-size: 12px;
+  color: var(--c-terracota);
+}
+
+.cta {
+  margin-top: 24px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sheet,
+  .link {
+    transform: none;
+  }
+}

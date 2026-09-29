@@ -1,0 +1,74 @@
+---
+import BookRow from "../components/books/BookRow.astro";
+import {books} from "../data/books";
+---
+
+<section class="books" id="libros">
+    <div class="booksInner container">
+        <div class="heading" data-books-heading>
+            <span class="line lineLeft" data-heading-line></span>
+            <h2 class="headingTitle serif" data-reveal>Mis publicaciones</h2>
+            <span class="line lineRight" data-heading-line></span>
+        </div>
+
+        {books.map((book, i) => (
+            <BookRow book={book} index={i} reverse={i % 2 === 1}/>
+        ))}
+    </div>
+</section>
+
+<style>
+    .books {
+        padding: 64px 0 clamp(96px, 10vw, 150px);
+        scroll-margin-top: 40px;
+    }
+
+    .booksInner {
+        display: flex;
+        flex-direction: column;
+        gap: 64px;
+    }
+
+    .heading {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
+        gap: 32px;
+        padding-top: 1px;
+    }
+
+    .line {
+        height: 1px;
+        background: var(--c-linea);
+    }
+
+    .lineLeft {
+        transform-origin: right;
+    }
+
+    .lineRight {
+        transform-origin: left;
+    }
+
+    .headingTitle {
+        font-weight: 600;
+        font-size: clamp(30px, 2.8vw, 40px);
+        letter-spacing: -0.015em;
+        color: var(--c-tinta);
+        white-space: nowrap;
+    }
+
+    @media (max-width: 767px) {
+        .books {
+            padding-top: 56px;
+        }
+
+        .booksInner {
+            gap: 72px;
+        }
+
+        .heading {
+            gap: 16px;
+        }
+    }
+</style>

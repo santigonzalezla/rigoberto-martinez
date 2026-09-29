@@ -1,0 +1,213 @@
+---
+import CartButton from "../components/cart/CartButton";
+import MobileMenu from "../components/nav/MobileMenu";
+
+const links = [
+    {href: "#libros", label: "Libros"},
+    {href: "#sobre-el-autor", label: "Sobre el autor"},
+    {href: "#contacto", label: "Contacto"}
+];
+---
+
+<header class="navbar" data-navbar data-intro>
+    <div class="navInner container">
+        <a href="#top" class="logo serif" aria-label="Rigoberto Martínez, inicio">
+            <span>Rigoberto</span>
+            <span>Martínez</span>
+        </a>
+
+        <nav class="navLinks" aria-label="Principal">
+            {links.map(({href, label}) => (
+                <a href={href} class="navLink" data-nav-link>{label}</a>
+            ))}
+        </nav>
+
+        <div class="navActions">
+            <CartButton client:load/>
+            <a href="#libros" class="btnPrimary navCta">Comprar libros</a>
+            <div class="navMobile">
+                <MobileMenu client:media="(max-width: 767px)"/>
+            </div>
+        </div>
+    </div>
+</header>
+
+<script>
+    const navbar = document.querySelector<HTMLElement>('[data-navbar]');
+    const navLinks = document.querySelectorAll<HTMLAnchorElement>('[data-nav-link]');
+
+    const onScroll = () => navbar?.classList.toggle('scrolled', window.scrollY > 12);
+    onScroll();
+    window.addEventListener('scroll', onScroll, {passive: true});
+
+    // Enlace activo según la sección visible
+    const sections = [...navLinks]
+        .map((link) => document.querySelector<HTMLElement>(link.hash))
+        .filter((el): el is HTMLElement => Boolean(el));
+
+    const observer = new IntersectionObserver((entries) =>
+    {
+        entries.forEach((entry) =>
+        {
+            if (!entry.isIntersecting) return;
+            navLinks.forEach((link) => link.classList.toggle('active', link.hash === `#${entry.target.id}`));
+        });
+    }, {rootMargin: '-45% 0px -50% 0px'});
+
+    sections.forEach((s) => observer.observe(s));
+</script>
+
+<style>
+    .navbar {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        transition: background-color 300ms ease, box-shadow 300ms ease, backdrop-filter 300ms ease;
+    }
+
+    .navbar::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 1px;
+        background: var(--c-linea);
+        transform: scaleX(0);
+        transition: transform 500ms var(--ease-out);
+    }
+
+    .navbar:global(.scrolled) {
+        background: rgba(244, 241, 236, 0.82);
+        backdrop-filter: saturate(1.4) blur(14px);
+        -webkit-backdrop-filter: saturate(1.4) blur(14px);
+        box-shadow: 0 10px 30px -18px rgba(62, 45, 30, 0.28);
+    }
+
+    .navbar:global(.scrolled)::after {
+        transform: scaleX(1);
+    }
+
+    .navInner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 28px;
+        padding-bottom: 28px;
+        transition: padding 300ms var(--ease-out);
+    }
+
+    .navbar:global(.scrolled) .navInner {
+        padding-top: 14px;
+        padding-bottom: 14px;
+    }
+
+    .logo {
+        display: flex;
+        flex-direction: column;
+        font-weight: 900;
+        font-size: 24px;
+        line-height: 0.96;
+        letter-spacing: -0.02em;
+        color: var(--c-tinta);
+    }
+
+    .navLinks {
+        display: flex;
+        align-items: center;
+        gap: 36px;
+    }
+
+    .navLink {
+        position: relative;
+        padding: 10px 0;
+        font-weight: 500;
+        font-size: 16px;
+        color: var(--c-grafito);
+        transition: color 200ms ease;
+    }
+
+    .navLink::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 4px;
+        height: 1.5px;
+        background: var(--c-terracota);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 320ms var(--ease-out);
+    }
+
+    .navLink:global(.active) {
+        color: var(--c-tinta);
+    }
+
+    .navLink:global(.active)::after {
+        transform: scaleX(1);
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+        .navLink:hover {
+            color: var(--c-tinta);
+        }
+
+        .navLink:hover::after {
+            transform: scaleX(1);
+        }
+    }
+
+    .navActions {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .navCta {
+        padding: 14px 26px;
+        font-size: 15px;
+    }
+
+    .navMobile {
+        display: none;
+    }
+
+    @media (max-width: 1024px) {
+        .navLinks {
+            gap: 24px;
+        }
+    }
+
+    @media (max-width: 767px) {
+        .navInner {
+            padding-top: 16px;
+            padding-bottom: 16px;
+        }
+
+        .logo {
+            font-size: 20px;
+        }
+
+        /* Con el menú abierto el nav queda por encima de la hoja para mostrar la X */
+        :global(html.menuOpen) .navbar {
+            z-index: 100;
+            background: transparent;
+            box-shadow: none;
+            backdrop-filter: none;
+        }
+
+        .navLinks,
+        .navCta {
+            display: none;
+        }
+
+        .navActions {
+            gap: 10px;
+        }
+
+        .navMobile {
+            display: block;
+        }
+    }
+</style>

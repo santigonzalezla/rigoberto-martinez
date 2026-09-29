@@ -1,0 +1,129 @@
+---
+import {Image} from "astro:assets";
+import retrato from "../assets/images/retrato.webp";
+
+const temas = ["Liderazgo y gestión", "Comportamiento organizacional", "Cultura y servicio", "Trabajo en equipo"];
+---
+
+<section class="about" id="sobre-el-autor">
+    <div class="aboutInner container">
+        <div class="avatarWrap" data-about-avatar>
+            <Image
+                src={retrato}
+                alt="Rigoberto Martínez Bermúdez"
+                widths={[168, 336]}
+                sizes="168px"
+                class="avatar"
+            />
+        </div>
+
+        <div class="bio">
+            <p class="eyebrow" data-about-item>Acerca de</p>
+            <h2 class="name serif" data-about-item>Rigoberto Martínez Bermúdez</h2>
+            <p class="text" data-about-item>
+                Administrador de Empresas con posgrado en formulación y evaluación de proyectos industriales y estudios en
+                alta gerencia. Autor de libros sobre liderazgo, comportamiento organizacional y cultura de servicio,
+                escritos a partir de su experiencia real en cargos administrativos y técnicos.
+            </p>
+            <p class="facts" data-about-item>
+                <span>3 libros</span><span class="sep">·</span><span>Liderazgo</span><span class="sep">·</span><span>Comportamiento organizacional</span><span class="sep">·</span><span>Cultura de servicio</span>
+            </p>
+            <ul class="temas">
+                {temas.map((tema) => <li class="chip" data-about-chip>{tema}</li>)}
+            </ul>
+        </div>
+    </div>
+</section>
+
+<style>
+    .about {
+        min-height: 800px;
+        display: flex;
+        align-items: center;
+        padding: 96px 0;
+        scroll-margin-top: 40px;
+    }
+
+    .aboutInner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 32px;
+    }
+
+    .avatarWrap {
+        position: relative;
+        width: 168px;
+        height: 168px;
+        border-radius: 50%;
+        box-shadow: var(--shadow-card);
+    }
+
+    /* Anillo de acento que rodea el retrato */
+    .avatarWrap::after {
+        content: '';
+        position: absolute;
+        inset: -8px;
+        border-radius: 50%;
+        border: 1px solid var(--c-linea);
+    }
+
+    .avatarWrap :global(.avatar) {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+        object-position: center 15%;
+    }
+
+    .bio {
+        width: min(640px, 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 18px;
+        text-align: center;
+    }
+
+    .name {
+        font-weight: 600;
+        font-size: clamp(28px, 2.4vw, 34px);
+        letter-spacing: -0.015em;
+        color: var(--c-tinta);
+    }
+
+    .text {
+        font-size: 16px;
+        line-height: 1.65;
+        color: var(--c-grafito);
+    }
+
+    .facts {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 4px 10px;
+        font-weight: 500;
+        font-size: 13px;
+        letter-spacing: 0.005em;
+        color: var(--c-tinta);
+    }
+
+    .sep {
+        color: var(--c-terracota);
+    }
+
+    .temas {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    @media (max-width: 767px) {
+        .about {
+            min-height: auto;
+            padding: 72px 0;
+        }
+    }
+</style>

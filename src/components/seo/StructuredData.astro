@@ -1,0 +1,53 @@
+---
+import {books} from "../../data/books";
+
+const siteUrl = Astro.site?.toString().replace(/\/$/, '') ?? 'https://rigobertomartinezautor.com';
+
+const author = {
+    '@type': 'Person',
+    '@id': `${siteUrl}/#author`,
+    name: 'Rigoberto Martínez Bermúdez',
+    alternateName: 'Rigoberto Martínez',
+    jobTitle: 'Autor y Administrador de Empresas',
+    email: 'contacto@rigobertomartinezautor.com',
+    url: siteUrl,
+    nationality: {'@type': 'Country', name: 'Colombia'},
+    knowsAbout: ['Liderazgo', 'Comportamiento organizacional', 'Cultura de servicio', 'Endomarketing', 'Trabajo en equipo']
+};
+
+const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+        {
+            '@type': 'WebSite',
+            '@id': `${siteUrl}/#website`,
+            url: siteUrl,
+            name: 'Rigoberto Martínez — Libros',
+            inLanguage: 'es-CO',
+            publisher: {'@id': `${siteUrl}/#author`}
+        },
+        author,
+        ...books.map((book) => ({
+            '@type': 'Book',
+            '@id': `${siteUrl}/#${book.id}`,
+            name: book.title,
+            author: {'@id': `${siteUrl}/#author`},
+            inLanguage: 'es',
+            datePublished: String(book.year),
+            bookEdition: book.edition,
+            genre: book.category,
+            description: book.synopsis,
+            image: new URL(book.cover.src, siteUrl).toString(),
+            offers: {
+                '@type': 'Offer',
+                price: book.price,
+                priceCurrency: 'COP',
+                availability: 'https://schema.org/InStock',
+                url: `${siteUrl}/#libros`
+            }
+        }))
+    ]
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(jsonLd)}/>

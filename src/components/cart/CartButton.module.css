@@ -1,0 +1,72 @@
+.cartButton {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border: 1px solid var(--c-linea);
+  border-radius: var(--r-pill);
+  color: var(--c-tinta);
+  background: rgba(255, 255, 255, 0.35);
+  transition: transform 160ms var(--ease-out), border-color 200ms ease, box-shadow 240ms var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cartButton:hover {
+    border-color: var(--c-taupe);
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+.cartButton:active {
+  transform: scale(0.95);
+}
+
+.cartButton.bump svg {
+  animation: cartNudge 420ms var(--ease-out);
+}
+
+.badge {
+  position: absolute;
+  top: -4px;
+  left: 28px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r-pill);
+  background: var(--c-terracota);
+  color: var(--c-hueso);
+  font-family: var(--f-sans);
+  font-weight: 500;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 0 0 2px var(--c-hueso);
+  animation: badgeIn 300ms var(--ease-out);
+}
+
+@keyframes badgeIn {
+  from {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+}
+
+@keyframes cartNudge {
+  30% {
+    transform: translateY(-2px) rotate(-8deg);
+  }
+  60% {
+    transform: translateY(0) rotate(4deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .badge,
+  .cartButton.bump svg {
+    animation: none;
+  }
+}

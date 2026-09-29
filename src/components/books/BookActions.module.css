@@ -1,0 +1,70 @@
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.actions .addButton {
+  position: relative;
+  display: inline-grid;
+  padding: 14px 26px;
+  font-size: 15px;
+}
+
+/* Estado "Agregado": se aclara a un tono papel con borde, el botón deja de ser la acción principal */
+.actions .addButton.isAdded {
+  background: var(--c-papel);
+  color: var(--c-tinta);
+  box-shadow: inset 0 0 0 1.5px var(--c-tinta);
+}
+
+/* Las dos etiquetas ocupan la misma celda: el ancho del botón no salta */
+.label {
+  grid-area: 1 / 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: opacity 220ms ease, filter 220ms ease, transform 220ms var(--ease-out);
+}
+
+.hidden {
+  opacity: 0;
+  filter: blur(3px);
+  transform: translateY(4px) scale(0.98);
+  pointer-events: none;
+}
+
+/* El check se dibuja al aparecer */
+.check {
+  stroke-dasharray: 22;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 360ms var(--ease-out) 80ms;
+}
+
+.hidden .check {
+  stroke-dashoffset: 22;
+  transition: none;
+}
+
+@media (max-width: 767px) {
+  .actions > * {
+    flex: 1 1 auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .label {
+    transition: opacity 150ms ease;
+  }
+
+  .hidden {
+    filter: none;
+    transform: none;
+  }
+
+  .check {
+    transition: none;
+  }
+}

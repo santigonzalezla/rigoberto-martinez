@@ -1,0 +1,224 @@
+---
+import {Image} from "astro:assets";
+import BookActions from "./BookActions";
+import {bookMeta, type Book} from "../../data/books";
+import {formatCOP} from "../../data/format";
+
+interface Props
+{
+    book: Book;
+    reverse?: boolean;
+    index: number;
+}
+
+const {book, reverse = false, index} = Astro.props;
+---
+
+<article class:list={["bookRow", {reverse}]} data-book-row data-direction={reverse ? "right" : "left"}>
+    <div class="coverParallax" data-cover-parallax>
+        <div class="coverReveal" data-cover-reveal>
+            <div class="coverTilt" data-tilt data-tilt-max="9">
+                <Image
+                    src={book.cover}
+                    alt={`Portada de ${book.title}`}
+                    widths={[340, 400, 800]}
+                    sizes="(max-width: 767px) 80vw, 400px"
+                    class="coverImg"
+                />
+                <span class="spineShade" aria-hidden="true"></span>
+                <span class="tiltGlare" data-tilt-glare aria-hidden="true"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="detail" data-book-detail>
+        <p class="meta">
+            <span class="index">0{index + 1}</span>
+            {bookMeta(book)}
+        </p>
+        <h3 class="title serif">{book.title}</h3>
+        <p class="synopsis">{book.synopsis}</p>
+        <p class="price">{formatCOP(book.price)} <span class="format">· eBook</span></p>
+        <BookActions client:visible id={book.id} title={book.title}/>
+    </div>
+</article>
+
+<style>
+    .bookRow {
+        display: grid;
+        grid-template-columns: 400px minmax(0, 1fr);
+        gap: 56px;
+        align-items: start;
+    }
+
+    .bookRow.reverse {
+        grid-template-columns: minmax(0, 1fr) 400px;
+    }
+
+    .bookRow.reverse .coverParallax {
+        order: 2;
+    }
+
+    .coverParallax {
+        perspective: 1200px;
+    }
+
+    .coverReveal {
+        transform-style: preserve-3d;
+    }
+
+    /* Portada como tapa dura: sombra en capas + bisagra en el lomo + borde de páginas */
+    .coverTilt {
+        position: relative;
+        width: 400px;
+        height: 520px;
+        border-radius: var(--r-md);
+        overflow: hidden;
+        transform-style: preserve-3d;
+        will-change: transform;
+        box-shadow:
+            var(--shadow-book),
+            6px 6px 0 -1px #EFE9DF,
+            6px 6px 0 0 var(--c-linea),
+            11px 11px 0 -1px #E9E2D6,
+            11px 11px 0 0 var(--c-linea);
+        transition: box-shadow 400ms var(--ease-out);
+    }
+
+    .coverTilt :global(.coverImg) {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 700ms var(--ease-out);
+    }
+
+    .spineShade {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background: linear-gradient(90deg,
+            rgba(20, 16, 12, 0.34) 0,
+            rgba(255, 255, 255, 0.16) 1.6%,
+            rgba(20, 16, 12, 0.1) 3.2%,
+            transparent 7%,
+            transparent 88%,
+            rgba(20, 16, 12, 0.08) 100%);
+    }
+
+    .tiltGlare {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0;
+        background: radial-gradient(circle at var(--gx, 50%) var(--gy, 30%), rgba(255, 255, 255, 0.32), transparent 55%);
+        mix-blend-mode: soft-light;
+        transition: opacity 400ms ease;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+        .bookRow:hover .coverTilt :global(.coverImg) {
+            transform: scale(1.02);
+        }
+    }
+
+    .detail {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 18px;
+        padding-top: 12px;
+    }
+
+    .meta {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 500;
+        font-size: 13px;
+        letter-spacing: 0.005em;
+        color: var(--c-grafito);
+    }
+
+    .index {
+        font-family: var(--f-mono);
+        font-size: 12px;
+        color: var(--c-terracota);
+    }
+
+    .title {
+        font-weight: 600;
+        font-size: clamp(28px, 2.5vw, 36px);
+        line-height: 1.08;
+        letter-spacing: -0.015em;
+        color: var(--c-tinta);
+    }
+
+    .synopsis {
+        max-width: 560px;
+        font-size: 16px;
+        line-height: 1.6;
+        color: var(--c-grafito);
+    }
+
+    .price {
+        font-weight: 600;
+        font-size: 16px;
+        font-variant-numeric: tabular-nums;
+        color: var(--c-tinta);
+    }
+
+    .format {
+        font-weight: 500;
+        font-size: 14px;
+        color: var(--c-grafito);
+    }
+
+    @media (max-width: 1024px) {
+        .bookRow,
+        .bookRow.reverse {
+            grid-template-columns: 320px minmax(0, 1fr);
+            gap: 40px;
+        }
+
+        .bookRow.reverse {
+            grid-template-columns: minmax(0, 1fr) 320px;
+        }
+
+        .coverTilt {
+            width: 320px;
+            height: 416px;
+        }
+    }
+
+    @media (max-width: 767px) {
+        .bookRow,
+        .bookRow.reverse {
+            grid-template-columns: 1fr;
+            gap: 32px;
+        }
+
+        .bookRow.reverse .coverParallax {
+            order: 0;
+        }
+
+        .coverParallax {
+            justify-self: center;
+            width: min(100%, 320px);
+        }
+
+        .coverTilt {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 400 / 520;
+        }
+
+        .detail {
+            gap: 14px;
+            padding-top: 0;
+        }
+
+        .detail > :global(*:last-child) {
+            width: 100%;
+        }
+    }
+</style>
