@@ -1,0 +1,39 @@
+<p style="margin:0 0 6px;font-family:Georgia,'Times New Roman',serif;font-style:italic;font-size:15px;color:#C68B84;">Pedido {{orderId}}</p>
+<h1 style="margin:0 0 16px;font-family:Georgia,'Times New Roman',serif;font-size:28px;line-height:1.2;font-weight:bold;letter-spacing:-0.3px;color:#232321;">Hola, {{firstName}}. Gracias por tu pedido.</h1>
+<p style="margin:0 0 28px;">
+  Recibí tu solicitud y ya la estoy revisando. Este es el resumen de lo que elegiste:
+</p>
+
+{{> order-summary}}
+
+<h2 style="margin:36px 0 16px;font-family:Georgia,'Times New Roman',serif;font-size:19px;font-weight:bold;color:#232321;">¿Qué sigue?</h2>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+  {{#each steps}}
+  <tr>
+    <td width="40" valign="top" style="padding:0 0 16px;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+        <td align="center" valign="middle" width="28" height="28" style="width:28px;height:28px;border-radius:50%;background:#F6ECEA;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:13px;font-weight:bold;color:#B5736B;">{{inc @index}}</td>
+      </tr></table>
+    </td>
+    <td valign="top" style="padding:3px 0 16px;">
+      <p style="margin:0;font-weight:bold;color:#232321;">{{title}}</p>
+      <p style="margin:2px 0 0;color:#6B6862;">{{text}}</p>
+    </td>
+  </tr>
+  {{/each}}
+</table>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:12px;background:#F4F1EC;border-radius:12px;">
+  <tr>
+    <td style="padding:16px 20px;font-size:13px;line-height:1.7;color:#6B6862;">
+      <strong style="color:#232321;">Datos del pedido</strong><br>
+      Número: {{orderId}}<br>
+      Fecha: {{date}}<br>
+      Correo de entrega: {{email}}
+    </td>
+  </tr>
+</table>
+
+<p style="margin:28px 0 0;">
+  Si tienes cualquier pregunta, responde directamente a este correo. Lo leo personalmente.
+</p>

@@ -50,6 +50,12 @@ export default function CartDrawer({catalog}: Props)
         };
     }, [isOpen]);
 
+    // El carrito guardado puede traer libros que ya no están en el catálogo
+    useEffect(() =>
+    {
+        cart.prune(catalog.map((b) => b.id));
+    }, [catalog]);
+
     useEffect(() =>
     {
         if (!isOpen) setStep('cart');

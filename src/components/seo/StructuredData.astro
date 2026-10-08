@@ -1,18 +1,18 @@
 ---
-import {books} from "../../data/books";
+import {AUTHOR_NAME, books} from "../../data/books";
 
 const siteUrl = Astro.site?.toString().replace(/\/$/, '') ?? 'https://rigobertomartinezautor.com';
 
 const author = {
     '@type': 'Person',
     '@id': `${siteUrl}/#author`,
-    name: 'Rigoberto Martínez Bermúdez',
+    name: AUTHOR_NAME,
     alternateName: 'Rigoberto Martínez',
-    jobTitle: 'Autor y Administrador de Empresas',
+    jobTitle: 'Autor y formador · Administrador de Empresas',
     email: 'contacto@rigobertomartinezautor.com',
     url: siteUrl,
     nationality: {'@type': 'Country', name: 'Colombia'},
-    knowsAbout: ['Liderazgo', 'Comportamiento organizacional', 'Cultura de servicio', 'Endomarketing', 'Trabajo en equipo']
+    knowsAbout: ['Gestión de proyectos', 'Monitoreo de proyectos', 'Servicio al cliente interno', 'Endomarketing', 'Eficiencia administrativa', 'Gestión de procesos', 'Comportamiento humano']
 };
 
 const jsonLd = {
@@ -31,12 +31,15 @@ const jsonLd = {
             '@type': 'Book',
             '@id': `${siteUrl}/#${book.id}`,
             name: book.title,
+            alternativeHeadline: book.subtitle,
             author: {'@id': `${siteUrl}/#author`},
             inLanguage: 'es',
-            datePublished: String(book.year),
+            bookFormat: 'https://schema.org/EBook',
             bookEdition: book.edition,
+            ...(book.isbn ? {isbn: book.isbn.replace(/-/g, '')} : {}),
             genre: book.category,
-            description: book.synopsis,
+            keywords: book.keywords.join(', '),
+            description: book.shortDescription,
             image: new URL(book.cover.src, siteUrl).toString(),
             offers: {
                 '@type': 'Offer',

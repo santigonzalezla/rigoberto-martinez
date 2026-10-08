@@ -1,0 +1,35 @@
+<p style="margin:0 0 6px;font-family:Georgia,'Times New Roman',serif;font-style:italic;font-size:15px;color:#C68B84;">Pedido {{orderId}} · Pago confirmado</p>
+<h1 style="margin:0 0 16px;font-family:Georgia,'Times New Roman',serif;font-size:28px;line-height:1.2;font-weight:bold;letter-spacing:-0.3px;color:#232321;">{{firstName}}, tus libros están listos.</h1>
+<p style="margin:0 0 28px;">
+  Gracias por tu compra. Ya puedes descargar {{itemsLabel}} en PDF. Cada archivo se genera en el momento de la descarga, con tu nombre como licencia personal.
+</p>
+
+{{#each links}}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 16px;border:1px solid #EFEAE2;border-radius:14px;background:#FBFAF7;">
+  <tr>
+    <td width="96" valign="top" style="padding:20px 0 20px 20px;">
+      <img src="{{../assetsUrl}}/email/cover-{{id}}.jpg" width="76" height="112" alt="Portada de {{title}}" style="display:block;width:76px;height:112px;border-radius:2px 8px 8px 2px;border:0;">
+    </td>
+    <td valign="middle" style="padding:20px;">
+      <p style="margin:0;font-family:Georgia,'Times New Roman',serif;font-size:17px;font-weight:bold;line-height:1.3;color:#232321;">{{title}}</p>
+      <p style="margin:4px 0 14px;font-size:13px;color:#7C6C5E;">{{subtitle}}</p>
+      {{> button href=url label="Descargar PDF" margin="0"}}
+    </td>
+  </tr>
+</table>
+{{/each}}
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:12px;background:#F6ECEA;border-radius:12px;">
+  <tr>
+    <td style="padding:18px 20px;font-size:14px;line-height:1.65;color:#5A4440;">
+      <strong style="color:#232321;">Los enlaces vencen el {{expires}}</strong> (hora de Colombia).
+      Descarga los archivos y guárdalos en tu dispositivo. Si se te pasa la fecha, responde este correo y te envío enlaces nuevos.
+    </td>
+  </tr>
+</table>
+
+<p style="margin:28px 0 0;font-size:14px;color:#6B6862;">
+  Cada PDF lleva tu nombre y tu correo como licencia de uso personal; por favor no lo compartas.
+  Si quieres ejemplares para tu equipo o tu empresa, responde este correo y te preparo una licencia corporativa.
+</p>
+<p style="margin:16px 0 0;">Que lo disfrutes y te sea útil.</p>

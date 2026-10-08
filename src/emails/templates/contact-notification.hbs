@@ -1,0 +1,23 @@
+<p style="margin:0 0 6px;font-family:Georgia,'Times New Roman',serif;font-style:italic;font-size:15px;color:#C68B84;">Mensaje desde la web · {{date}}</p>
+<h1 style="margin:0 0 24px;font-family:Georgia,'Times New Roman',serif;font-size:26px;line-height:1.2;font-weight:bold;letter-spacing:-0.3px;color:#232321;">{{name}} te escribió</h1>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-left:3px solid #C68B84;background:#FBFAF7;border-radius:0 12px 12px 0;">
+  <tr>
+    <td style="padding:20px 24px;font-size:15px;line-height:1.7;color:#232321;">
+      {{{messageHtml}}}
+    </td>
+  </tr>
+</table>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:24px;font-size:14px;">
+  <tr>
+    <td width="38%" style="padding:6px 0;color:#6B6862;">Correo</td>
+    <td style="padding:6px 0;"><a href="mailto:{{email}}" style="color:#232321;">{{email}}</a></td>
+  </tr>
+  <tr>
+    <td style="padding:6px 0;color:#6B6862;">Autorización de datos</td>
+    <td style="padding:6px 0;color:#232321;">Aceptada el {{date}}</td>
+  </tr>
+</table>
+
+{{> button href=replyUrl label=replyLabel margin="28px 0 0"}}

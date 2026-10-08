@@ -1,8 +1,8 @@
 import {ActionError, defineAction} from 'astro:actions';
 import {z} from 'astro:schema';
-import {formatCOP} from '../data/format';
-import {AUTHOR_EMAIL, button, escape, colombiaDateTime, layout, row, sendEmail} from '../lib/email';
-import {booksOf, createConfirmToken, newOrderId, type Order} from '../lib/fulfillment';
+import {AUTHOR_EMAIL, colombiaDateTime, sendEmail} from '../lib/email';
+import {firstNameOf, renderEmail, textToHtml} from '../lib/emailRenderer';
+import {booksOf, createConfirmToken, DOWNLOAD_TTL_HOURS, newOrderId, orderSummary, type Order} from '../lib/fulfillment';
 
 // eBooks: una licencia por título; qty se ignora
 const itemsSchema = z.array(z.object({id: z.string()})).min(1, 'El carrito está vacío').max(20);
@@ -16,20 +16,51 @@ export const server = {
             message: z.string().trim().min(1, 'Escribe tu mensaje').max(4000),
             dataConsent: z.string().min(1, 'Debes autorizar el tratamiento de datos')
         }),
-        handler: async ({name, email, message}) =>
+        handler: async ({name, email, message}, context) =>
         {
+            const origin = context.url.origin;
+            const firstName = firstNameOf(name);
+            const messageHtml = textToHtml(message);
+
             await sendEmail({
                 to: AUTHOR_EMAIL,
                 replyTo: email,
-                subject: `Nuevo mensaje desde la web: ${name}`,
-                html: layout('Nuevo mensaje desde rigobertomartinezautor.com', `
-                  <table style="width: 100%; border-collapse: collapse; margin-top: 16px;">
-                    ${row('Nombre', escape(name))}
-                    ${row('Correo', `<a href="mailto:${escape(email)}">${escape(email)}</a>`)}
-                    ${row('Mensaje', escape(message).replace(/\n/g, '<br/>'))}
-                    ${row('Autorización datos', `Aceptada el ${colombiaDateTime()} (Colombia)`)}
-                  </table>`)
+                subject: `Nuevo mensaje de ${name}`,
+                html: renderEmail('contact-notification', {
+                    name,
+                    firstName,
+                    email,
+                    messageHtml,
+                    date: colombiaDateTime(),
+                    replyUrl: `mailto:${email}?subject=${encodeURIComponent('Re: tu mensaje en rigobertomartinezautor.com')}`,
+                    replyLabel: `Responder a ${firstName}`
+                }, {
+                    subject: `Nuevo mensaje de ${name}`,
+                    preheader: message.slice(0, 110),
+                    eyebrow: 'Formulario de contacto',
+                    origin
+                })
             });
+
+            // Acuse al remitente: si falla, el mensaje ya llegó al autor.
+            await sendEmail({
+                to: email,
+                replyTo: AUTHOR_EMAIL,
+                subject: 'Recibí tu mensaje',
+                html: renderEmail('contact-received', {
+                    firstName,
+                    messageHtml,
+                    booksUrl: `${origin}/#libros`
+                }, {
+                    subject: 'Recibí tu mensaje',
+                    preheader: 'Gracias por escribir. Te responderé en menos de 48 horas.',
+                    eyebrow: 'Contacto',
+                    origin,
+                    signature: true,
+                    footerNote: 'Recibes este correo porque escribiste desde el formulario de contacto.'
+                })
+            }).catch((err) => console.error('[contact] acknowledgement failed:', err));
+
             return {success: true};
         }
     }),
@@ -63,63 +94,65 @@ export const server = {
                 throw new ActionError({code: 'BAD_REQUEST', message: 'Carrito inválido'});
             }
 
+            const origin = context.url.origin;
             const order: Order = {id: newOrderId(), name, email, phone, bookIds: lines.map((b) => b.id)};
-            const total = lines.reduce((sum, b) => sum + b.price, 0);
-            const confirmUrl = `${context.url.origin}/order/confirm?token=${encodeURIComponent(createConfirmToken(order))}`;
+            const summary = orderSummary(lines);
+            const firstName = firstNameOf(name);
+            const date = colombiaDateTime();
+            const confirmUrl = `${origin}/order/confirm?token=${encodeURIComponent(createConfirmToken(order))}`;
 
-            const itemsHtml = lines.map((b) => `
-              <tr>
-                <td style="padding: 8px 10px;">${escape(b.title)}</td>
-                <td style="padding: 8px 10px; text-align: center;">eBook</td>
-                <td style="padding: 8px 10px; text-align: right;">${formatCOP(b.price)}</td>
-              </tr>`).join('');
-
+            const notificationSubject = `Nuevo pedido ${order.id} · ${name} · ${summary.total}`;
             await sendEmail({
                 to: AUTHOR_EMAIL,
                 replyTo: email,
-                subject: `Nuevo pedido de eBooks ${order.id}: ${name} · ${formatCOP(total)}`,
-                html: layout(`Nuevo pedido ${order.id}`, `
-                  <table style="width: 100%; border-collapse: collapse; margin-top: 16px;">
-                    <tr style="background: #232321; color: #F4F1EC;">
-                      <th style="padding: 8px 10px; text-align: left;">Libro</th>
-                      <th style="padding: 8px 10px;">Formato</th>
-                      <th style="padding: 8px 10px; text-align: right;">Precio</th>
-                    </tr>
-                    ${itemsHtml}
-                    <tr>
-                      <td colspan="2" style="padding: 10px; font-weight: bold; border-top: 1px solid #DBD6CD;">Total</td>
-                      <td style="padding: 10px; font-weight: bold; text-align: right; border-top: 1px solid #DBD6CD;">${formatCOP(total)}</td>
-                    </tr>
-                  </table>
-                  <table style="width: 100%; border-collapse: collapse; margin-top: 24px;">
-                    ${row('Pedido', escape(order.id))}
-                    ${row('Nombre', escape(name))}
-                    ${row('Correo', `<a href="mailto:${escape(email)}">${escape(email)}</a>`)}
-                    ${row('Teléfono', escape(phone))}
-                    ${row('Autorización datos', `Aceptada el ${colombiaDateTime()} (Colombia)`)}
-                  </table>
-                  <h3 style="margin-top: 28px;">Siguientes pasos</h3>
-                  <ol style="line-height: 1.6; padding-left: 20px;">
-                    <li>Responde a este correo con los datos de pago.</li>
-                    <li>Cuando recibas el pago, pulsa el botón. El comprador recibirá sus eBooks sellados con su nombre y enlaces que vencen.</li>
-                  </ol>
-                  ${button(confirmUrl, 'Confirmar pago y enviar eBooks')}
-                  <p style="color: #6B6862; font-size: 13px;">No reenvíes este correo: el botón entrega los libros a este comprador.</p>`)
+                subject: notificationSubject,
+                html: renderEmail('order-notification', {
+                    ...summary,
+                    orderId: order.id,
+                    name,
+                    firstName,
+                    email,
+                    phone,
+                    phoneHref: phone.replace(/[^\d+]/g, ''),
+                    date,
+                    confirmUrl,
+                    ttlHours: DOWNLOAD_TTL_HOURS
+                }, {
+                    subject: notificationSubject,
+                    preheader: `${summary.itemsLabel} por ${summary.total}. Confirma el pago para enviar los eBooks.`,
+                    eyebrow: 'Nuevo pedido',
+                    origin
+                })
             });
 
-            // Acuse al comprador. Si falla (p. ej. dominio de envío sin verificar), el pedido ya quedó registrado.
+            // Acuse al comprador. Si falla, el pedido ya quedó registrado en el correo del autor.
+            const receivedSubject = `Recibimos tu pedido ${order.id}`;
             await sendEmail({
                 to: email,
                 replyTo: AUTHOR_EMAIL,
-                subject: `Recibimos tu pedido ${order.id}`,
-                html: layout(`Hola, ${escape(name)}`, `
-                  <p>Recibimos tu pedido <strong>${escape(order.id)}</strong> por <strong>${formatCOP(total)}</strong>:</p>
-                  <ul>${lines.map((b) => `<li>${escape(b.title)} (eBook)</li>`).join('')}</ul>
-                  <p>En menos de 48 horas te escribiré con los datos de pago. Al confirmarlo recibirás los enlaces de descarga en este correo.</p>
-                  <p style="color: #6B6862;">Rigoberto Martínez Bermúdez</p>`)
-            }).catch((err) => console.error('[order] acuse al comprador falló:', err));
+                subject: receivedSubject,
+                html: renderEmail('order-received', {
+                    ...summary,
+                    orderId: order.id,
+                    firstName,
+                    email,
+                    date,
+                    steps: [
+                        {title: 'Te escribo con los datos de pago', text: 'En menos de 48 horas recibirás en este correo las opciones para pagar.'},
+                        {title: 'Realizas el pago', text: 'Cuando lo recibo, confirmo tu pedido de inmediato.'},
+                        {title: 'Descargas tus eBooks', text: `Te llega un enlace de descarga por cada libro, válido por ${DOWNLOAD_TTL_HOURS} horas.`}
+                    ]
+                }, {
+                    subject: receivedSubject,
+                    preheader: `Gracias, ${firstName}. Recibí tu pedido de ${summary.itemsLabel} por ${summary.total}.`,
+                    eyebrow: 'Tu pedido',
+                    origin,
+                    signature: true,
+                    footerNote: 'Recibes este correo porque hiciste un pedido en nuestra página.'
+                })
+            }).catch((err) => console.error('[order] buyer acknowledgement failed:', err));
 
-            return {success: true, orderId: order.id, total};
+            return {success: true, orderId: order.id, total: summary.totalValue};
         }
     })
 };

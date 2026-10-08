@@ -2,7 +2,8 @@ import {randomBytes} from 'node:crypto';
 import {books, type Book} from '../data/books';
 import {formatCOP} from '../data/format';
 import {createToken, verifyToken} from './tokens';
-import {AUTHOR_EMAIL, button, escape, layout, sendEmail} from './email';
+import {AUTHOR_EMAIL, colombiaDateTime, sendEmail} from './email';
+import {firstNameOf, renderEmail} from './emailRenderer';
 
 /**
  * Entrega de eBooks.
@@ -49,13 +50,26 @@ export const createConfirmToken = (order: Order) => createToken(CONFIRM_PURPOSE,
 export const verifyConfirmToken = (token: string) => verifyToken<Order>(CONFIRM_PURPOSE, token);
 export const verifyDownloadToken = (token: string) => verifyToken<DownloadGrant>(DOWNLOAD_PURPOSE, token);
 
+/** Datos de resumen compartidos por las plantillas de pedido */
+export function orderSummary(items: Book[])
+{
+    const totalValue = items.reduce((sum, b) => sum + b.price, 0);
+    return {
+        items: items.map((b) => ({id: b.id, title: b.title, isbn: b.isbn, price: formatCOP(b.price)})),
+        itemsLabel: items.length === 1 ? '1 eBook' : `${items.length} eBooks`,
+        total: formatCOP(totalValue),
+        totalValue
+    };
+}
+
 export async function fulfillOrder(order: Order, origin: string)
 {
     const items = booksOf(order.bookIds);
     if (items.length === 0) throw new Error('El pedido no tiene libros válidos');
 
-    const expires = new Date(Date.now() + DOWNLOAD_TTL_HOURS * 3600 * 1000)
-        .toLocaleString('es-CO', {timeZone: 'America/Bogota', dateStyle: 'long', timeStyle: 'short'});
+    const expires = colombiaDateTime(new Date(Date.now() + DOWNLOAD_TTL_HOURS * 3600 * 1000));
+    const firstName = firstNameOf(order.name);
+    const {itemsLabel} = orderSummary(items);
 
     const links = items.map((book) =>
     {
@@ -64,29 +78,22 @@ export async function fulfillOrder(order: Order, origin: string)
             {orderId: order.id, bookId: book.id, name: order.name, email: order.email},
             DOWNLOAD_TTL_HOURS * 3600
         );
-        return {book, url: `${origin}/download/${token}`};
+        return {id: book.id, title: book.title, subtitle: book.subtitle, url: `${origin}/download/${token}`};
     });
 
+    const subject = `${firstName}, tus eBooks están listos · Pedido ${order.id}`;
     await sendEmail({
         to: order.email,
         replyTo: AUTHOR_EMAIL,
-        subject: `Tus eBooks están listos · Pedido ${order.id}`,
-        html: layout(`Gracias por tu compra, ${escape(order.name)}`, `
-          <p>Tu pago del pedido <strong>${escape(order.id)}</strong> fue confirmado. Aquí están tus libros:</p>
-          ${links.map(({book, url}) => `
-            <div style="padding: 16px 0; border-bottom: 1px solid #DBD6CD;">
-              <p style="margin: 0 0 4px; font-size: 17px; font-weight: bold;">${escape(book.title)}</p>
-              <p style="margin: 0 0 8px; color: #6B6862;">eBook en PDF · ${formatCOP(book.price)}</p>
-              ${button(url, 'Descargar PDF')}
-            </div>`).join('')}
-          <p style="margin-top: 20px; color: #6B6862; font-size: 14px;">
-            Los enlaces son personales y vencen el <strong>${expires}</strong> (hora de Colombia).
-            Descarga los archivos y guárdalos en tu dispositivo.
-          </p>
-          <p style="color: #6B6862; font-size: 14px;">
-            Cada PDF lleva tu nombre y tu correo como licencia de uso personal. Por favor no lo compartas.
-            Si necesitas copias para tu equipo, responde este correo y te ayudo con una licencia corporativa.
-          </p>`)
+        subject,
+        html: renderEmail('ebooks-ready', {orderId: order.id, firstName, itemsLabel, links, expires}, {
+            subject,
+            preheader: `Pago confirmado. Descarga ${itemsLabel} antes del ${expires}.`,
+            eyebrow: 'Tus eBooks',
+            origin,
+            signature: true,
+            footerNote: 'Recibes este correo porque compraste en nuestra página. Los enlaces son personales.'
+        })
     });
 
     return {links: links.length, expires};

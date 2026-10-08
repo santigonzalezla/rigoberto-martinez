@@ -11,9 +11,9 @@ import path from 'node:path';
 const OUT_DIR = path.resolve('private/ebooks');
 
 const books = [
-    {id: 'lider-que-tu-equipo-necesita', title: 'Conviértete en el Líder que tu Equipo Necesita'},
-    {id: 'la-conchudez', title: 'La Conchudez'},
-    {id: 'endomarketing-y-cliente-interno', title: 'Endomarketing y Cliente Interno'}
+    {id: 'project-monitoring', title: 'Monitoreo aplicado a proyectos'},
+    {id: 'conchudos', title: '¡Fuera, Conchudos!'},
+    {id: 'internal-customer', title: 'Atención centrada en el cliente interno'}
 ];
 
 await fs.mkdir(OUT_DIR, {recursive: true});

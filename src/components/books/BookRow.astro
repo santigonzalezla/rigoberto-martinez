@@ -21,8 +21,8 @@ const {book, reverse = false, index} = Astro.props;
                 <Image
                     src={book.cover}
                     alt={`Portada de ${book.title}`}
-                    widths={[340, 400, 800]}
-                    sizes="(max-width: 767px) 80vw, 400px"
+                    widths={[320, 380, 760]}
+                    sizes="(max-width: 767px) 80vw, 380px"
                     class="coverImg"
                 />
                 <span class="spineShade" aria-hidden="true"></span>
@@ -36,8 +36,11 @@ const {book, reverse = false, index} = Astro.props;
             <span class="index">0{index + 1}</span>
             {bookMeta(book)}
         </p>
-        <h3 class="title serif">{book.title}</h3>
-        <p class="synopsis">{book.synopsis}</p>
+        <div class="heading">
+            <h3 class="title serif">{book.title}</h3>
+            <p class="subtitle serif">{book.subtitle}</p>
+        </div>
+        <p class="description">{book.shortDescription}</p>
         <p class="price">{formatCOP(book.price)} <span class="format">· eBook</span></p>
         <BookActions client:visible id={book.id} title={book.title}/>
     </div>
@@ -46,13 +49,13 @@ const {book, reverse = false, index} = Astro.props;
 <style>
     .bookRow {
         display: grid;
-        grid-template-columns: 400px minmax(0, 1fr);
-        gap: 56px;
-        align-items: start;
+        grid-template-columns: 380px minmax(0, 1fr);
+        gap: 72px;
+        align-items: center;
     }
 
     .bookRow.reverse {
-        grid-template-columns: minmax(0, 1fr) 400px;
+        grid-template-columns: minmax(0, 1fr) 380px;
     }
 
     .bookRow.reverse .coverParallax {
@@ -70,9 +73,10 @@ const {book, reverse = false, index} = Astro.props;
     /* Portada como tapa dura: sombra en capas + bisagra en el lomo + borde de páginas */
     .coverTilt {
         position: relative;
-        width: 400px;
-        height: 520px;
-        border-radius: var(--r-md);
+        /* Proporción real de las portadas (≈ 2:3) para no recortar texto */
+        width: 380px;
+        aspect-ratio: 380 / 560;
+        border-radius: 4px 12px 12px 4px;
         overflow: hidden;
         transform-style: preserve-3d;
         will-change: transform;
@@ -153,7 +157,22 @@ const {book, reverse = false, index} = Astro.props;
         color: var(--c-tinta);
     }
 
-    .synopsis {
+    .heading {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .subtitle {
+        font-style: italic;
+        font-weight: 400;
+        font-size: 17px;
+        line-height: 1.4;
+        color: var(--c-taupe);
+        max-width: 560px;
+    }
+
+    .description {
         max-width: 560px;
         font-size: 16px;
         line-height: 1.6;
@@ -176,17 +195,16 @@ const {book, reverse = false, index} = Astro.props;
     @media (max-width: 1024px) {
         .bookRow,
         .bookRow.reverse {
-            grid-template-columns: 320px minmax(0, 1fr);
+            grid-template-columns: 300px minmax(0, 1fr);
             gap: 40px;
         }
 
         .bookRow.reverse {
-            grid-template-columns: minmax(0, 1fr) 320px;
+            grid-template-columns: minmax(0, 1fr) 300px;
         }
 
         .coverTilt {
-            width: 320px;
-            height: 416px;
+            width: 300px;
         }
     }
 
@@ -203,13 +221,11 @@ const {book, reverse = false, index} = Astro.props;
 
         .coverParallax {
             justify-self: center;
-            width: min(100%, 320px);
+            width: min(100%, 280px);
         }
 
         .coverTilt {
             width: 100%;
-            height: auto;
-            aspect-ratio: 400 / 520;
         }
 
         .detail {

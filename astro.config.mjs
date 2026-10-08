@@ -15,9 +15,9 @@ export default defineConfig({
     adapter: vercel({
         // Los eBooks viven fuera de public/ y se empaquetan dentro de la función serverless.
         includeFiles: [
-            './private/ebooks/lider-que-tu-equipo-necesita.pdf',
-            './private/ebooks/la-conchudez.pdf',
-            './private/ebooks/endomarketing-y-cliente-interno.pdf'
+            './private/ebooks/project-monitoring.pdf',
+            './private/ebooks/conchudos.pdf',
+            './private/ebooks/internal-customer.pdf'
         ]
     }),
 });

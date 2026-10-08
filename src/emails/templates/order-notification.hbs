@@ -1,0 +1,35 @@
+<p style="margin:0 0 6px;font-family:Georgia,'Times New Roman',serif;font-style:italic;font-size:15px;color:#C68B84;">Nuevo pedido · {{date}}</p>
+<h1 style="margin:0 0 16px;font-family:Georgia,'Times New Roman',serif;font-size:28px;line-height:1.2;font-weight:bold;letter-spacing:-0.3px;color:#232321;">{{name}} quiere {{itemsLabel}} por {{total}}</h1>
+<p style="margin:0 0 28px;">Pedido <strong style="color:#232321;">{{orderId}}</strong>. Al comprador ya le llegó un acuse de recibido.</p>
+
+{{> order-summary}}
+
+<h2 style="margin:36px 0 12px;font-family:Georgia,'Times New Roman',serif;font-size:19px;font-weight:bold;color:#232321;">Comprador</h2>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #EFEAE2;border-radius:12px;">
+  <tr>
+    <td width="38%" style="padding:12px 16px;border-bottom:1px solid #EFEAE2;font-size:13px;color:#6B6862;">Nombre</td>
+    <td style="padding:12px 16px;border-bottom:1px solid #EFEAE2;color:#232321;">{{name}}</td>
+  </tr>
+  <tr>
+    <td style="padding:12px 16px;border-bottom:1px solid #EFEAE2;font-size:13px;color:#6B6862;">Correo</td>
+    <td style="padding:12px 16px;border-bottom:1px solid #EFEAE2;"><a href="mailto:{{email}}" style="color:#232321;">{{email}}</a></td>
+  </tr>
+  <tr>
+    <td style="padding:12px 16px;border-bottom:1px solid #EFEAE2;font-size:13px;color:#6B6862;">Teléfono / WhatsApp</td>
+    <td style="padding:12px 16px;border-bottom:1px solid #EFEAE2;"><a href="tel:{{phoneHref}}" style="color:#232321;">{{phone}}</a></td>
+  </tr>
+  <tr>
+    <td style="padding:12px 16px;font-size:13px;color:#6B6862;">Autorización de datos</td>
+    <td style="padding:12px 16px;color:#232321;">Aceptada el {{date}}</td>
+  </tr>
+</table>
+
+<h2 style="margin:36px 0 12px;font-family:Georgia,'Times New Roman',serif;font-size:19px;font-weight:bold;color:#232321;">Siguientes pasos</h2>
+<ol style="margin:0 0 24px;padding-left:20px;color:#4A4743;">
+  <li style="margin-bottom:6px;">Responde este correo con los datos de pago. La respuesta le llega directo a {{firstName}}.</li>
+  <li style="margin-bottom:6px;">Cuando confirmes el pago, pulsa el botón. {{firstName}} recibirá sus eBooks sellados con su nombre y enlaces válidos por {{ttlHours}} horas.</li>
+</ol>
+
+{{> button href=confirmUrl label="Confirmar pago y enviar eBooks" fullWidth=true}}
+
+<p style="margin:16px 0 0;font-size:13px;color:#8A857D;">No reenvíes este correo: el botón entrega los libros a este comprador.</p>

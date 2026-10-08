@@ -1,15 +1,15 @@
 ---
 import {Image} from "astro:assets";
-import retrato from "../assets/images/retrato.webp";
+import author from "../assets/images/author.webp";
 
-const temas = ["Liderazgo y gestión", "Comportamiento organizacional", "Cultura y servicio", "Trabajo en equipo"];
+const topics = ["Gestión de proyectos", "Cliente interno", "Eficiencia administrativa", "Gestión de procesos", "Humanización en salud", "Servicio al ciudadano"];
 ---
 
 <section class="about" id="sobre-el-autor">
     <div class="aboutInner container">
         <div class="avatarWrap" data-about-avatar>
             <Image
-                src={retrato}
+                src={author}
                 alt="Rigoberto Martínez Bermúdez"
                 widths={[168, 336]}
                 sizes="168px"
@@ -21,15 +21,16 @@ const temas = ["Liderazgo y gestión", "Comportamiento organizacional", "Cultura
             <p class="eyebrow" data-about-item>Acerca de</p>
             <h2 class="name serif" data-about-item>Rigoberto Martínez Bermúdez</h2>
             <p class="text" data-about-item>
-                Administrador de Empresas con posgrado en formulación y evaluación de proyectos industriales y estudios en
-                alta gerencia. Autor de libros sobre liderazgo, comportamiento organizacional y cultura de servicio,
-                escritos a partir de su experiencia real en cargos administrativos y técnicos.
+                Administrador de Empresas, con posgrado en formulación y evaluación de proyectos industriales y estudios en
+                alta gerencia. Amplia experiencia en cargos administrativos y técnicos, con responsabilidades en la gestión
+                de proyectos de diferente naturaleza. Formador y autor de publicaciones sobre eficiencia administrativa,
+                tramitomanía, gestión de procesos y procedimientos, humanización en salud, servicio al ciudadano y cliente interno.
             </p>
             <p class="facts" data-about-item>
-                <span>3 libros</span><span class="sep">·</span><span>Liderazgo</span><span class="sep">·</span><span>Comportamiento organizacional</span><span class="sep">·</span><span>Cultura de servicio</span>
+                <span>3 libros</span><span class="sep">·</span><span>Proyectos</span><span class="sep">·</span><span>Comportamiento</span><span class="sep">·</span><span>Servicio</span>
             </p>
             <ul class="temas">
-                {temas.map((tema) => <li class="chip" data-about-chip>{tema}</li>)}
+                {topics.map((topic) => <li class="chip" data-about-chip>{topic}</li>)}
             </ul>
         </div>
     </div>

@@ -27,12 +27,13 @@
 
 .dialog {
   position: relative;
-  width: min(960px, 100%);
+  width: min(1040px, 100%);
   max-height: calc(100dvh - 48px);
   overflow-y: auto;
   display: grid;
-  grid-template-columns: 1fr 1.05fr;
-  gap: 48px;
+  grid-template-columns: 320px minmax(0, 1fr);
+  align-items: start;
+  gap: 56px;
   padding: 56px;
   background: var(--c-hueso);
   border: 1px solid var(--c-linea);
@@ -72,7 +73,8 @@
 
 /* ── Libro 3D ─────────────────────────────── */
 .stage {
-  position: relative;
+  position: sticky;
+  top: 0;
   display: grid;
   place-items: center;
   perspective: 1400px;
@@ -80,9 +82,9 @@
 }
 
 .book {
-  --w: 260px;
-  --h: 340px;
-  --d: 34px;
+  --w: 250px;
+  --h: 369px;
+  --d: 30px;
   position: relative;
   width: var(--w);
   height: var(--h);
@@ -181,8 +183,8 @@
 .info {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 16px;
+  gap: 28px;
+  min-width: 0;
 }
 
 .info > * {
@@ -199,7 +201,14 @@
 .open .info > *:nth-child(2) { transition-delay: 60ms; }
 .open .info > *:nth-child(3) { transition-delay: 120ms; }
 .open .info > *:nth-child(4) { transition-delay: 180ms; }
-.open .info > *:nth-child(5) { transition-delay: 240ms; }
+.open .info > *:nth-child(n + 5) { transition-delay: 240ms; }
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-right: 48px;
+}
 
 .meta {
   font-weight: 500;
@@ -211,27 +220,38 @@
 .title {
   font-family: var(--f-serif);
   font-weight: 600;
-  font-size: clamp(28px, 3vw, 36px);
-  line-height: 1.08;
+  font-size: clamp(28px, 3vw, 38px);
+  line-height: 1.06;
   letter-spacing: -0.015em;
   color: var(--c-tinta);
   font-variation-settings: "SOFT" 0, "WONK" 1;
 }
 
-.synopsis {
-  font-size: 16px;
-  line-height: 1.6;
-  color: var(--c-grafito);
-  max-width: 60ch;
+.subtitle {
+  font-family: var(--f-serif);
+  font-style: italic;
+  font-size: 18px;
+  line-height: 1.4;
+  color: var(--c-taupe);
+  font-variation-settings: "SOFT" 0, "WONK" 1;
 }
 
 .buy {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 20px;
-  margin-top: 8px;
-  padding-top: 20px;
-  border-top: 1px solid var(--c-linea);
+  padding: 18px 20px;
+  background: var(--c-papel);
+  border: 1px solid var(--c-linea);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.buy > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .price {
@@ -241,11 +261,116 @@
   color: var(--c-tinta);
 }
 
-.note {
+.format {
+  font-size: 12px;
+  color: var(--c-grafito);
+}
+
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 24px;
+  border-top: 1px solid var(--c-linea);
+}
+
+.blockTitle {
   font-family: var(--f-serif);
   font-style: italic;
-  font-size: 14px;
-  color: var(--c-taupe);
+  font-weight: 400;
+  font-size: 16px;
+  color: var(--c-terracota);
+  font-variation-settings: "SOFT" 0, "WONK" 1;
+}
+
+.text {
+  font-size: 15.5px;
+  line-height: 1.65;
+  color: var(--c-grafito);
+  max-width: 62ch;
+}
+
+.highlights {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  list-style: none;
+}
+
+.highlights li {
+  position: relative;
+  padding-left: 22px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--c-tinta);
+}
+
+.highlights li::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 0.62em;
+  width: 10px;
+  height: 1.5px;
+  background: var(--c-terracota);
+}
+
+.chapters {
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+}
+
+.chapters li {
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  gap: 8px;
+  padding: 10px 0;
+  border-bottom: 1px dashed var(--c-linea);
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--c-tinta);
+}
+
+.chapters li:last-child {
+  border-bottom: none;
+}
+
+.chapterIndex {
+  font-family: var(--f-mono);
+  font-size: 12px;
+  line-height: 1.9;
+  color: var(--c-terracota);
+}
+
+.details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 24px;
+}
+
+.details div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.details div:last-child {
+  grid-column: 1 / -1;
+}
+
+.details dt {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--c-grafito);
+}
+
+.details dd {
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--c-tinta);
+  font-variant-numeric: tabular-nums;
 }
 
 @media (max-width: 767px) {
@@ -263,9 +388,17 @@
   }
 
   .book {
-    --w: 180px;
-    --h: 236px;
-    --d: 26px;
+    --w: 170px;
+    --h: 251px;
+    --d: 22px;
+  }
+
+  .stage {
+    position: relative;
+  }
+
+  .intro {
+    padding-right: 0;
   }
 
   .buy {
@@ -274,8 +407,8 @@
     gap: 14px;
   }
 
-  .price {
-    text-align: center;
+  .details {
+    grid-template-columns: 1fr;
   }
 }
 

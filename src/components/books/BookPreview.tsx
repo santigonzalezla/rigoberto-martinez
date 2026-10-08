@@ -22,7 +22,11 @@ export default function BookPreview({catalog}: Props)
     useEffect(() =>
     {
         const next = catalog.find((b) => b.id === previewId);
-        if (next) setBook(next);
+        if (next)
+        {
+            setBook(next);
+            dialogRef.current?.scrollTo({top: 0});
+        }
     }, [previewId, catalog]);
 
     useEffect(() =>
@@ -123,16 +127,59 @@ export default function BookPreview({catalog}: Props)
                         </div>
 
                         <div className={styles.info}>
-                            <p className={styles.meta}>{book.meta}</p>
-                            <h2 id="bookPreviewTitle" className={styles.title}>{book.title}</h2>
-                            <p className={styles.synopsis}>{book.synopsis}</p>
+                            <header className={styles.intro}>
+                                <p className={styles.meta}>{book.meta}</p>
+                                <h2 id="bookPreviewTitle" className={styles.title}>{book.title}</h2>
+                                <p className={styles.subtitle}>{book.subtitle}</p>
+                            </header>
+
                             <div className={styles.buy}>
-                                <span className={styles.price}>{formatCOP(book.price)}</span>
+                                <div>
+                                    <span className={styles.price}>{formatCOP(book.price)}</span>
+                                    <span className={styles.format}>eBook en PDF · llega a tu correo al confirmar el pago</span>
+                                </div>
                                 <button type="button" className="btnPrimary" onClick={handleAdd}>
                                     {added ? 'Agregado · Ver carrito' : 'Agregar al carrito'}
                                 </button>
                             </div>
-                            <p className={styles.note}>eBook · Rigoberto Martínez Bermúdez</p>
+
+                            <section className={styles.block} aria-labelledby="previewReview">
+                                <h3 id="previewReview" className={styles.blockTitle}>Reseña</h3>
+                                {book.review.map((paragraph) => <p key={paragraph.slice(0, 24)} className={styles.text}>{paragraph}</p>)}
+                            </section>
+
+                            <section className={styles.block} aria-labelledby="previewHighlights">
+                                <h3 id="previewHighlights" className={styles.blockTitle}>Lo que encontrarás</h3>
+                                <ul className={styles.highlights}>
+                                    {book.highlights.map((item) => <li key={item}>{item}</li>)}
+                                </ul>
+                            </section>
+
+                            {book.chapters.length > 0 && (
+                                <section className={styles.block} aria-labelledby="previewChapters">
+                                    <h3 id="previewChapters" className={styles.blockTitle}>Contenido</h3>
+                                    <ol className={styles.chapters}>
+                                        {book.chapters.map((chapter, i) => (
+                                            <li key={chapter}>
+                                                <span className={styles.chapterIndex}>{String(i + 1).padStart(2, '0')}</span>
+                                                {chapter}
+                                            </li>
+                                        ))}
+                                    </ol>
+                                </section>
+                            )}
+
+                            <section className={styles.block} aria-labelledby="previewDetails">
+                                <h3 id="previewDetails" className={styles.blockTitle}>Ficha técnica</h3>
+                                <dl className={styles.details}>
+                                    {book.details.map(({label, value}) => (
+                                        <div key={label}>
+                                            <dt>{label}</dt>
+                                            <dd>{value}</dd>
+                                        </div>
+                                    ))}
+                                </dl>
+                            </section>
                         </div>
                     </>
                 )}

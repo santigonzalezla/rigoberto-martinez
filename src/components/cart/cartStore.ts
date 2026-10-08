@@ -5,8 +5,12 @@ export interface CatalogBook
 {
     id: string;
     title: string;
+    subtitle: string;
     meta: string;
-    synopsis: string;
+    review: string[];
+    highlights: string[];
+    chapters: string[];
+    details: {label: string; value: string}[];
     price: number;
     cover: string;
 }
@@ -105,6 +109,13 @@ export const cart = {
     {
         if (state.items.some((i) => i.id === id)) return;
         setState({items: [...state.items, {id, qty: 1}], lastAddedAt: Date.now()});
+    },
+    /** Descarta ids que ya no existen en el catálogo (libros retirados o renombrados). */
+    prune(validIds: string[])
+    {
+        hydrate();
+        const items = state.items.filter((i) => validIds.includes(i.id));
+        if (items.length !== state.items.length) setState({items});
     },
     remove(id: string)
     {

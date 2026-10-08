@@ -1,7 +1,7 @@
 ---
 import Analytics from '@vercel/analytics/astro';
 import {getImage} from 'astro:assets';
-import defaultOgSource from '../assets/images/retrato.webp';
+import defaultOgSource from '../assets/images/author.webp';
 
 interface Props
 {
@@ -13,8 +13,8 @@ interface Props
 }
 
 const {
-    title = "Rigoberto Martínez — Libros sobre liderazgo, comportamiento y cultura de equipo",
-    description = "Conviértete en el Líder que tu Equipo Necesita, La Conchudez y Endomarketing y Cliente Interno: tres libros de Rigoberto Martínez Bermúdez para liderar con criterio.",
+    title = "Rigoberto Martínez — Libros sobre proyectos, comportamiento y cultura de servicio",
+    description = "Monitoreo aplicado a proyectos, ¡Fuera, Conchudos! y Atención centrada en el cliente interno: tres eBooks de Rigoberto Martínez Bermúdez.",
     image,
     canonical,
     noindex = false
@@ -252,6 +252,13 @@ const ogImageURL = new URL(image ?? ogImage.src, Astro.site);
             transform: translateY(-1px);
             background: rgba(124, 108, 94, 0.08);
         }
+    }
+
+    .btnPrimary:disabled {
+        opacity: 0.6;
+        cursor: progress;
+        transform: none;
+        box-shadow: none;
     }
 
     .btnPrimary:active,

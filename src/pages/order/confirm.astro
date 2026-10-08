@@ -1,6 +1,7 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import StatusCard from "../../components/ui/StatusCard.astro";
+import StatusToast from "../../components/ui/StatusToast";
 import {booksOf, DOWNLOAD_TTL_HOURS, fulfillOrder, verifyConfirmToken} from "../../lib/fulfillment";
 import {formatCOP} from "../../data/format";
 
@@ -8,13 +9,15 @@ export const prerender = false;
 
 /*
  * Página privada del autor. Se abre desde el botón del correo del pedido.
- * GET solo muestra el resumen: los escáneres de enlaces de los correos hacen GET,
- * así que la entrega exige pulsar el botón (POST).
+ * - GET solo muestra el resumen: los escáneres de enlaces de los correos hacen GET,
+ *   así que la entrega exige pulsar el botón (POST).
+ * - Tras un POST exitoso se redirige (POST/redirect/GET): recargar la página
+ *   no vuelve a enviar los eBooks al comprador.
  */
 type View =
-    | {kind: 'review'}
+    | {kind: 'review'; deliveryError?: string}
     | {kind: 'sent'; expires: string}
-    | {kind: 'error'; message: string};
+    | {kind: 'invalid'; message: string};
 
 let token = Astro.url.searchParams.get('token') ?? '';
 if (Astro.request.method === 'POST')
@@ -29,7 +32,7 @@ let view: View = {kind: 'review'};
 if (!verified.ok)
 {
     view = {
-        kind: 'error',
+        kind: 'invalid',
         message: verified.reason === 'expired'
             ? 'Este enlace de confirmación venció (30 días). Pídele al comprador que haga el pedido de nuevo.'
             : 'El enlace no es válido. Ábrelo directamente desde el correo del pedido.'
@@ -39,33 +42,39 @@ else if (Astro.request.method === 'POST')
 {
     try
     {
-        const result = await fulfillOrder(verified.payload, Astro.url.origin);
-        view = {kind: 'sent', expires: result.expires};
+        const {expires} = await fulfillOrder(verified.payload, Astro.url.origin);
+        const params = new URLSearchParams({token, sent: '1', expires});
+        return Astro.redirect(`/order/confirm?${params}`, 303);
     }
     catch (err)
     {
         console.error('[order/confirm] delivery failed:', err);
-        view = {kind: 'error', message: 'No se pudo enviar el correo con los eBooks. Revisa la configuración de Resend e intenta de nuevo.'};
+        view = {kind: 'review', deliveryError: 'No se pudo enviar el correo con los eBooks. Revisa la configuración de Resend e intenta de nuevo.'};
     }
+}
+else if (Astro.url.searchParams.get('sent') === '1')
+{
+    view = {kind: 'sent', expires: Astro.url.searchParams.get('expires') ?? ''};
 }
 
 const order = verified.ok ? verified.payload : null;
 const items = order ? booksOf(order.bookIds) : [];
 const total = items.reduce((sum, b) => sum + b.price, 0);
+const booksLabel = `${items.length} ${items.length === 1 ? 'eBook' : 'eBooks'}`;
 
 Astro.response.headers.set('Cache-Control', 'no-store');
 Astro.response.headers.set('Referrer-Policy', 'no-referrer');
 ---
 
 <Layout title="Confirmar pedido · Rigoberto Martínez" noindex>
-    {view.kind === 'error' && (
+    {view.kind === 'invalid' && (
         <StatusCard eyebrow="Confirmación de pedido" title="No se pudo continuar" tone="error">
             <p>{view.message}</p>
         </StatusCard>
     )}
 
     {view.kind === 'review' && order && (
-        <StatusCard eyebrow={`Pedido ${order.id}`} title="Confirmar pago y enviar eBooks">
+        <StatusCard eyebrow={`Pedido ${order.id}`} title="Confirmar pago y enviar eBooks" tone={view.deliveryError ? 'error' : 'default'}>
             <p><strong>{order.name}</strong> · {order.email} · {order.phone}</p>
             <ul>
                 {items.map((b) => <li>{b.title} — {formatCOP(b.price)}</li>)}
@@ -75,17 +84,43 @@ Astro.response.headers.set('Referrer-Policy', 'no-referrer');
                 Confirma solo cuando hayas recibido el pago. El comprador recibirá un enlace por libro,
                 válido por {DOWNLOAD_TTL_HOURS} horas, con el PDF sellado con su nombre y correo.
             </p>
-            <form method="POST">
+            <form method="POST" data-confirm-form>
                 <input type="hidden" name="token" value={token}/>
-                <button type="submit" class="btnPrimary">Confirmar pago y enviar eBooks</button>
+                <button type="submit" class="btnPrimary" data-confirm-button>
+                    {view.deliveryError ? 'Intentar de nuevo' : 'Confirmar pago y enviar eBooks'}
+                </button>
             </form>
         </StatusCard>
     )}
 
+    {view.kind === 'review' && view.deliveryError && (
+        <StatusToast client:only="react" type="error" message="No se enviaron los eBooks" description={view.deliveryError}/>
+    )}
+
     {view.kind === 'sent' && order && (
-        <StatusCard eyebrow={`Pedido ${order.id}`} title="eBooks enviados" tone="success">
-            <p>Le enviamos a <strong>{order.email}</strong> los enlaces de descarga de {items.length} {items.length === 1 ? 'libro' : 'libros'}.</p>
-            <p>Los enlaces vencen el <strong>{view.expires}</strong>. Si el comprador no alcanza a descargarlos, vuelve a abrir este enlace y pulsa el botón otra vez: se generan enlaces nuevos.</p>
-        </StatusCard>
+        <>
+            <StatusCard eyebrow={`Pedido ${order.id}`} title="eBooks enviados" tone="success">
+                <p>Le enviamos a <strong>{order.email}</strong> los enlaces de descarga de {booksLabel}.</p>
+                {view.expires && <p>Los enlaces vencen el <strong>{view.expires}</strong>.</p>}
+                <p>Si el comprador no alcanza a descargarlos, vuelve a abrir el enlace del correo del pedido y pulsa el botón otra vez: se generan enlaces nuevos.</p>
+            </StatusCard>
+            <StatusToast
+                client:only="react"
+                type="success"
+                message={`eBooks enviados a ${order.name.split(' ')[0]}`}
+                description={`${booksLabel} · ${order.email}`}
+            />
+        </>
     )}
 </Layout>
+
+<script>
+    // Evita doble envío: bloquea el botón mientras se generan y envían los correos
+    document.querySelector<HTMLFormElement>('[data-confirm-form]')?.addEventListener('submit', () =>
+    {
+        const button = document.querySelector<HTMLButtonElement>('[data-confirm-button]');
+        if (!button) return;
+        button.disabled = true;
+        button.textContent = 'Enviando eBooks…';
+    });
+</script>
