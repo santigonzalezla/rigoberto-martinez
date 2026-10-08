@@ -42,15 +42,15 @@ export const books: Book[] = [
         place: 'Colombia',
         isbn: null,
         audience: 'Gerentes, formuladores, supervisores y equipos de proyectos públicos y privados',
-        shortDescription: 'Cómo monitorear un proyecto desde su formulación hasta su operación para anticipar sobrecostos, retrasos y fracasos, con el modelo FEA: formulación, ejecución y ajustes.',
+        shortDescription: 'Cómo monitorear un proyecto desde su formulación hasta su operación para anticipar sobrecostos, retrasos y fracasos, con el Modelo FEA: Formulación, Ejecución y Ajustes.',
         review: [
             'Esta publicación se ocupa del monitoreo como la forma más efectiva de garantizar el éxito de un proyecto, no solo en su formulación sino también en la ejecución, los ajustes y la operación. Aplicado con rigor y con tecnología de seguimiento apropiada, incluida la inteligencia artificial, el monitoreo evita los tropiezos que suelen tomar por sorpresa: ineficiencias, sobrecostos, cierres inesperados, acciones judiciales, desmotivación y pérdida de recursos.',
-            'En lugar del control convencional, el libro plantea una gestión integrada por la formulación, la ejecución y los ajustes, atravesada por el monitoreo y seguida de un control que define e implanta las mejoras. De ahí nace el modelo FEA, una guía práctica para quienes participan en la gestión de proyectos públicos y privados.'
+            'En lugar del control convencional, el libro plantea una gestión integrada por la formulación, la ejecución y los ajustes, atravesada por el monitoreo y seguida de un control que define e implanta las mejoras. De ahí nace el Modelo FEA, una guía práctica para quienes participan en la gestión de proyectos públicos y privados.'
         ],
         highlights: [
             'Las principales causas de fracaso de los proyectos y los riesgos que pueden derribarlos.',
             'Los ingredientes de un monitoreo efectivo, apoyado en tecnología de seguimiento e inteligencia artificial.',
-            'El modelo FEA: formulación, ejecución y ajustes, con el monitoreo como acción transversal.',
+            'El Modelo FEA: Formulación, Ejecución y Ajustes, con el monitoreo como acción transversal.',
             'Un control orientado a definir e implantar mejoras, no solo a señalar fallas.',
             'Factores clave de éxito para proyectos públicos y privados.'
         ],

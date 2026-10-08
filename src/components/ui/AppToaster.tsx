@@ -1,17 +1,21 @@
 import {Toaster} from 'sonner';
 
-/** Toaster único del sitio, con los colores de la marca. */
+/**
+ * Toaster único del sitio. `richColors` da el color según el tipo:
+ * success en verde, error en rojo. Solo se fijan tipografía y radio para no pisar esos colores.
+ */
 export default function AppToaster()
 {
     return (
         <Toaster
-            position="bottom-center"
+            position="top-right"
+            richColors
+            closeButton
+            offset={{top: 88, right: 24}}
+            mobileOffset={{top: 76, right: 12, left: 12}}
             toastOptions={{
                 style: {
                     fontFamily: 'Geist, sans-serif',
-                    background: '#232321',
-                    color: '#F4F1EC',
-                    border: 'none',
                     borderRadius: '14px'
                 }
             }}
