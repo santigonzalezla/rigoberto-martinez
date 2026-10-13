@@ -56,7 +56,7 @@ export const books: Book[] = [
         ],
         chapters: [],
         keywords: ['Monitoreo', 'Proyectos', 'Control', 'Gestión de riesgos', 'Indicadores', 'Éxito del proyecto', 'Causas de fracaso', 'Acción preventiva y correctiva'],
-        price: 39900,
+        price: 19000,
         cover: coverProjectMonitoring
     },
     {
@@ -87,7 +87,7 @@ export const books: Book[] = [
             'Ante el panorama de la conchudez, ¿qué se puede hacer y por parte de quiénes?'
         ],
         keywords: ['Conchudez', 'Comportamiento', 'Relaciones familiares', 'Clima laboral', 'Autoevaluación'],
-        price: 39900,
+        price: 19000,
         cover: coverConchudos
     },
     {
@@ -120,7 +120,7 @@ export const books: Book[] = [
             'Plan de mejoramiento de la atención al cliente interno'
         ],
         keywords: ['Cliente interno', 'Endomarketing', 'Servicio', 'Cultura organizacional', 'Clima laboral', 'Calidad del servicio'],
-        price: 39900,
+        price: 19000,
         cover: coverInternalCustomer
     }
 ];

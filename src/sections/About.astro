@@ -1,8 +1,6 @@
 ---
 import {Image} from "astro:assets";
 import author from "../assets/images/author.webp";
-
-const topics = ["Gestión de proyectos", "Cliente interno", "Eficiencia administrativa", "Gestión de procesos", "Humanización en salud", "Servicio al ciudadano"];
 ---
 
 <section class="about" id="sobre-el-autor">
@@ -26,12 +24,6 @@ const topics = ["Gestión de proyectos", "Cliente interno", "Eficiencia administ
                 de proyectos de diferente naturaleza. Formador y autor de publicaciones sobre eficiencia administrativa,
                 tramitomanía, gestión de procesos y procedimientos, humanización en salud, servicio al ciudadano y cliente interno.
             </p>
-            <p class="facts" data-about-item>
-                <span>3 libros</span><span class="sep">·</span><span>Proyectos</span><span class="sep">·</span><span>Comportamiento</span><span class="sep">·</span><span>Servicio</span>
-            </p>
-            <ul class="temas">
-                {topics.map((topic) => <li class="chip" data-about-chip>{topic}</li>)}
-            </ul>
         </div>
     </div>
 </section>
@@ -97,28 +89,6 @@ const topics = ["Gestión de proyectos", "Cliente interno", "Eficiencia administ
         font-size: 16px;
         line-height: 1.65;
         color: var(--c-grafito);
-    }
-
-    .facts {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 4px 10px;
-        font-weight: 500;
-        font-size: 13px;
-        letter-spacing: 0.005em;
-        color: var(--c-tinta);
-    }
-
-    .sep {
-        color: var(--c-terracota);
-    }
-
-    .temas {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 10px;
     }
 
     @media (max-width: 767px) {

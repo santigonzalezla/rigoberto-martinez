@@ -79,7 +79,7 @@ export default function CartDrawer({catalog}: Props)
             return;
         }
 
-        toast.success('Pedido recibido. Te escribiremos en menos de 48 horas con los datos de pago y, al confirmarlo, recibirás tus eBooks.');
+        toast.success('Pedido recibido. Te escribiremos lo más pronto posible con los datos de pago y, al confirmarlo, recibirás tus eBooks.');
         cart.clear();
         cart.close();
     }

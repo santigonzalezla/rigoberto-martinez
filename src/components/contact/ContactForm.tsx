@@ -21,7 +21,7 @@ export default function ContactForm()
         }
         else
         {
-            toast.success('Mensaje enviado. Te respondo personalmente en menos de 48 horas.');
+            toast.success('Mensaje enviado. Te respondo personalmente lo más pronto posible.');
             form.reset();
         }
 

@@ -113,8 +113,7 @@ if (isLanding) mm.add("(prefers-reduced-motion: no-preference)", () =>
     // Acerca de
     const aboutTl = gsap.timeline({scrollTrigger: {trigger: "#sobre-el-autor", start: "top 70%", once: true}});
     aboutTl.from("[data-about-avatar]", {autoAlpha: 0, scale: 0.9, y: 20, duration: 1, ease: easeExpo})
-        .from("[data-about-item]", {autoAlpha: 0, y: 20, duration: 0.8, stagger: 0.08, ease}, 0.15)
-        .from("[data-about-chip]", {autoAlpha: 0, y: 12, scale: 0.96, duration: 0.6, stagger: 0.06, ease}, 0.5);
+        .from("[data-about-item]", {autoAlpha: 0, y: 20, duration: 0.8, stagger: 0.08, ease}, 0.15);
 
     // Contacto: copy en cascada y la tarjeta del formulario se levanta desde la perspectiva
     const contactTl = gsap.timeline({scrollTrigger: {trigger: "#contacto", start: "top 70%", once: true}});

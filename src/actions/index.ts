@@ -53,7 +53,7 @@ export const server = {
                     booksUrl: `${origin}/#libros`
                 }, {
                     subject: 'Recibí tu mensaje',
-                    preheader: 'Gracias por escribir. Te responderé en menos de 48 horas.',
+                    preheader: 'Gracias por escribir. Te responderé lo más pronto posible.',
                     eyebrow: 'Contacto',
                     origin,
                     signature: true,
@@ -138,7 +138,7 @@ export const server = {
                     email,
                     date,
                     steps: [
-                        {title: 'Te escribo con los datos de pago', text: 'En menos de 48 horas recibirás en este correo las opciones para pagar.'},
+                        {title: 'Te escribo con los datos de pago', text: 'Muy pronto recibirás en este correo las opciones para pagar.'},
                         {title: 'Realizas el pago', text: 'Cuando lo recibo, confirmo tu pedido de inmediato.'},
                         {title: 'Descargas tus eBooks', text: `Te llega un enlace de descarga por cada libro, válido por ${DOWNLOAD_TTL_HOURS} horas.`}
                     ]
