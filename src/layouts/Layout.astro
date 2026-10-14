@@ -1,5 +1,6 @@
 ---
 import Analytics from '@vercel/analytics/astro';
+import SpeedInsights from '@vercel/speed-insights/astro';
 import {getImage} from 'astro:assets';
 import defaultOgSource from '../assets/images/author.webp';
 
@@ -64,6 +65,7 @@ const ogImageURL = new URL(image ?? ogImage.src, Astro.site);
     />
     <slot name="head"/>
     <Analytics/>
+    <SpeedInsights/>
 </head>
 <body>
 <slot/>
